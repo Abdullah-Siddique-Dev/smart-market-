@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+target/
+
+# Build outputs
+dist/
+build/
+
+# Tauri
+src-tauri/target/
+
+# Environment & Local
+.env
+.env.local
+*.local
+
+# IDE & OS
+.vscode/
+.idea/
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# SQLite local databases & logs
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.db
+backups/
