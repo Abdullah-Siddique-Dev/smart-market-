@@ -129,15 +129,25 @@ export const ProductList: React.FC = () => {
     },
   ];
 
+  const totalLoaded = products.length;
+  const outOfStockCount = products.filter((p) => p.current_stock <= 0).length;
+  const lowStockCount = products.filter(
+    (p) => p.current_stock > 0 && p.current_stock <= p.min_stock_alert
+  ).length;
+  const healthyCount = products.filter((p) => p.current_stock > p.min_stock_alert).length;
+
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 max-w-7xl mx-auto w-full">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-foreground">
-            Inventory Catalog & Receiving [F4]
-          </h1>
-          <p className="text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-foreground">
+              Inventory Catalog & Receiving
+            </h1>
+            <kbd className="kbd text-[10px]">F4</kbd>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Central wholesale master catalog, stock levels, and inward container receiving
           </p>
         </div>
@@ -165,19 +175,62 @@ export const ProductList: React.FC = () => {
       {/* Stock Alerts Notice */}
       <StockAlerts onQuickImport={handleQuickImport} />
 
+      {/* Metric Stat Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Catalog SKUs
+          </div>
+          <div className="text-xl font-black font-mono text-foreground mt-1">
+            {pagination?.totalRecords || totalLoaded}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Active catalog entries</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Healthy Stock
+          </div>
+          <div className="text-xl font-black font-mono text-emerald-600 mt-1">
+            {healthyCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Above minimum threshold</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Low Stock Warnings
+          </div>
+          <div className="text-xl font-black font-mono text-amber-600 mt-1">
+            {lowStockCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Near exhaustion buffer</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Critical Out of Stock
+          </div>
+          <div className="text-xl font-black font-mono text-destructive mt-1">
+            {outOfStockCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Requires immediate import</div>
+        </div>
+      </div>
+
       {/* Search Toolbar */}
-      <div className="flex items-center gap-3 bg-card p-3 rounded-lg border border-border/80 shadow-sm">
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex items-center gap-3 bg-card p-3 rounded-xl border border-border/80 shadow-xs">
+        <div className="relative flex-1 max-w-md">
           <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search by SKU or description..."
+            placeholder="Search by SKU, barcode, or product name..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
               setPage(1);
             }}
-            className="h-8 pl-8 text-xs"
+            className="h-8 pl-8 text-xs font-mono"
           />
         </div>
       </div>

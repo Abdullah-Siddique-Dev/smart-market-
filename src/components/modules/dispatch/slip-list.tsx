@@ -100,26 +100,66 @@ export const SlipList: React.FC = () => {
     },
   ];
 
+  const totalLoadedSlips = slips.length;
+  const activeDispatchesCount = slips.filter((s) => s.status === 'DISPATCHED').length;
+  const reconciledCount = slips.filter((s) => s.status === 'RECONCILED').length;
+
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 max-w-7xl mx-auto w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-foreground">
-            Warehouse Dispatch Slips [F3]
-          </h1>
-          <p className="text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-foreground">
+              Warehouse Dispatch Slips
+            </h1>
+            <kbd className="kbd text-[10px]">F3</kbd>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Gate passes for goods released to order bookers and returned unsold stock reconciliation
           </p>
         </div>
 
-        <Button onClick={() => setIsGeneratorOpen(true)} className="gap-2 font-semibold shadow-sm">
+        <Button onClick={() => setIsGeneratorOpen(true)} className="gap-2 font-semibold shadow-xs">
           <Truck className="h-4 w-4" />
           <span>New Dispatch Gate Pass</span>
         </Button>
       </div>
 
-      <div className="flex items-center gap-3 bg-card p-3 rounded-lg border border-border/80 shadow-sm">
-        <div className="w-48">
+      {/* Dispatch Gate Pass Metric Strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Gate Passes
+          </div>
+          <div className="text-xl font-black font-mono text-foreground mt-1">
+            {pagination?.totalRecords || totalLoadedSlips}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Issued warehouse releases</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Active in Field / Dispatched
+          </div>
+          <div className="text-xl font-black font-mono text-amber-600 mt-1">
+            {activeDispatchesCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Inventory out with bookers</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Reconciled & Restocked
+          </div>
+          <div className="text-xl font-black font-mono text-emerald-600 mt-1">
+            {reconciledCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Accounts settled & closed</div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 bg-card p-3 rounded-xl border border-border/80 shadow-xs">
+        <div className="w-56">
           <Select
             value={statusFilter}
             onChange={(e) => {
@@ -128,7 +168,7 @@ export const SlipList: React.FC = () => {
             }}
             className="h-8 text-xs"
           >
-            <option value="">All Slips</option>
+            <option value="">All Slips ({slips.length})</option>
             <option value="DISPATCHED">Dispatched (Active)</option>
             <option value="RECONCILED">Reconciled / Settled</option>
           </Select>

@@ -143,14 +143,24 @@ export const ShopList: React.FC = () => {
     },
   ];
 
+  const totalLoadedShops = shops.length;
+  const totalReceivables = shops.reduce((sum, s) => sum + (s.outstanding_balance || 0), 0);
+  const overLimitCount = shops.filter(
+    (s) => s.credit_limit > 0 && s.outstanding_balance >= s.credit_limit
+  ).length;
+  const clearKhataCount = shops.filter((s) => (s.outstanding_balance || 0) <= 0).length;
+
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 max-w-7xl mx-auto w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-foreground">
-            Retail Customers & Khata Ledger [F6]
-          </h1>
-          <p className="text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-foreground">
+              Retail Customers & Khata Ledger
+            </h1>
+            <kbd className="kbd text-[10px]">F6</kbd>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Customer directory, credit limits, outstanding balances, and cash recovery history
           </p>
         </div>
@@ -167,12 +177,55 @@ export const ShopList: React.FC = () => {
         </Button>
       </div>
 
-      <div className="flex items-center gap-3 bg-card p-3 rounded-lg border border-border/80 shadow-sm">
-        <div className="relative flex-1 max-w-sm">
+      {/* Khata Receivables Metric Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Accounts
+          </div>
+          <div className="text-xl font-black font-mono text-foreground mt-1">
+            {pagination?.totalRecords || totalLoadedShops}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Registered retail clients</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Receivables
+          </div>
+          <div className="text-xl font-black font-mono text-amber-600 mt-1">
+            <AmountDisplay amount={totalReceivables} size="md" className="font-bold" />
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Current outstanding market debt</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Over Credit Limit
+          </div>
+          <div className="text-xl font-black font-mono text-destructive mt-1">
+            {overLimitCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Hold dispatch until paid</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Zero Balance / Clear
+          </div>
+          <div className="text-xl font-black font-mono text-emerald-600 mt-1">
+            {clearKhataCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Fully settled accounts</div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 bg-card p-3 rounded-xl border border-border/80 shadow-xs">
+        <div className="relative flex-1 max-w-md">
           <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search shop, owner, phone..."
+            placeholder="Search shop name, proprietor, phone, market..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);

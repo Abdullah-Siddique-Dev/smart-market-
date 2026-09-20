@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { AmountDisplay } from '@/components/shared/amount-display';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { formatDateTime } from '@/lib/utils/date';
-import { Printer, CheckCircle2, Copy } from 'lucide-react';
+import { CheckCircle2, Copy } from 'lucide-react';
 import { useBill } from '@/lib/queries/use-bills';
 
 interface BillPrintPreviewProps {
@@ -25,10 +25,6 @@ export const BillPrintPreview: React.FC<BillPrintPreviewProps> = ({
   onOpenChange,
 }) => {
   const { data: bill, isLoading } = useBill(billId || 0);
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   const handleCopySummary = () => {
     if (!bill) return;
@@ -178,24 +174,12 @@ export const BillPrintPreview: React.FC<BillPrintPreviewProps> = ({
             className="gap-1.5"
           >
             <Copy className="h-3.5 w-3.5" />
-            <span>Copy Text</span>
+            <span>Copy Invoice Details</span>
           </Button>
 
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handlePrint}
-              className="gap-1.5"
-            >
-              <Printer className="h-3.5 w-3.5" />
-              <span>Print Browser Slip</span>
-            </Button>
-            <Button type="button" size="sm" onClick={() => onOpenChange(false)}>
-              Done
-            </Button>
-          </div>
+          <Button type="button" size="sm" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

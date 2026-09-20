@@ -128,14 +128,27 @@ export const BookerList: React.FC = () => {
     },
   ];
 
+  const totalLoadedBookers = bookers.length;
+  const activeBookersCount = bookers.filter((b) => b.is_active).length;
+  const avgCommission =
+    bookers.length > 0
+      ? (bookers.reduce((sum, b) => sum + (b.commission_rate || 0), 0) / bookers.length).toFixed(1)
+      : '0';
+  const assignedTerritoriesCount = new Set(
+    bookers.map((b) => b.territory).filter(Boolean)
+  ).size;
+
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 max-w-7xl mx-auto w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-foreground">
-            Order Bookers & Field Sales [F5]
-          </h1>
-          <p className="text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-foreground">
+              Order Bookers & Field Sales
+            </h1>
+            <kbd className="kbd text-[10px]">F5</kbd>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Commission agents, route assignments, performance tracking, and cash reconciliation
           </p>
         </div>
@@ -152,8 +165,51 @@ export const BookerList: React.FC = () => {
         </Button>
       </div>
 
-      <div className="flex items-center gap-3 bg-card p-3 rounded-lg border border-border/80 shadow-sm">
-        <div className="relative flex-1 max-w-sm">
+      {/* Field Sales Metric Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Total Staff
+          </div>
+          <div className="text-xl font-black font-mono text-foreground mt-1">
+            {pagination?.totalRecords || totalLoadedBookers}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Registered field reps</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Active in Field
+          </div>
+          <div className="text-xl font-black font-mono text-emerald-600 mt-1">
+            {activeBookersCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Authorized for order booking</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Avg Commission
+          </div>
+          <div className="text-xl font-black font-mono text-primary mt-1">
+            {avgCommission}%
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Standard commission basis</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Covered Territories
+          </div>
+          <div className="text-xl font-black font-mono text-indigo-600 mt-1">
+            {assignedTerritoriesCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Active delivery beats/routes</div>
+        </div>
+      </div>
+
+      <div className="flex items-center gap-3 bg-card p-3 rounded-xl border border-border/80 shadow-xs">
+        <div className="relative flex-1 max-w-md">
           <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             type="text"

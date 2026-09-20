@@ -57,15 +57,18 @@ export const ProfitDashboard: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 max-w-7xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <BarChart3 className="h-6 w-6 text-primary" />
-            <span>Executive Profit & Sales Analytics [F7]</span>
-          </h1>
-          <p className="text-xs text-muted-foreground">
+            <h1 className="text-xl font-bold tracking-tight text-foreground">
+              Executive Profit & Sales Analytics
+            </h1>
+            <kbd className="kbd text-[10px]">F7</kbd>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
             True landed-cost margin calculations, real-time revenue, and wholesale profitability
           </p>
         </div>

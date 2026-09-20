@@ -148,26 +148,78 @@ export const OrderList: React.FC = () => {
     },
   ];
 
+  // Calculate quick stats from loaded orders
+  const pendingCount = orders.filter((o) => o.status === 'PENDING').length;
+  const dispatchedCount = orders.filter((o) => o.status === 'DISPATCHED').length;
+  const billedCount = orders.filter((o) => o.status === 'BILLED').length;
+  const totalVolume = orders.reduce((sum, o) => sum + (o.total_amount || 0), 0);
+
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 max-w-7xl mx-auto w-full">
       {/* Top Bar: Title & Primary Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-foreground">Pre-Booking Orders [F2]</h1>
-          <p className="text-xs text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <h1 className="text-xl font-bold tracking-tight text-foreground">Pre-Booking Orders</h1>
+            <kbd className="kbd text-[10px]">F2</kbd>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Manage wholesale orders taken by bookers, dispatch slips, and invoice conversion
           </p>
         </div>
 
-        <Button onClick={() => setIsFormOpen(true)} className="gap-2 font-semibold shadow-sm">
+        <Button onClick={() => setIsFormOpen(true)} className="gap-2 font-semibold shadow-xs">
           <Plus className="h-4 w-4" />
           <span>New Wholesale Order</span>
         </Button>
       </div>
 
+      {/* Metric Stat Strip */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Pending Dispatch
+          </div>
+          <div className="text-xl font-black font-mono text-amber-600 mt-1">
+            {pendingCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Awaiting warehouse dispatch</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            In Transit / Dispatched
+          </div>
+          <div className="text-xl font-black font-mono text-indigo-600 mt-1">
+            {dispatchedCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Assigned to field bookers</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Billed & Completed
+          </div>
+          <div className="text-xl font-black font-mono text-emerald-600 mt-1">
+            {billedCount}
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">Invoiced to client Khata</div>
+        </div>
+
+        <div className="p-3 rounded-xl bg-card border border-border/80 shadow-xs">
+          <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+            Page Order Volume
+          </div>
+          <div className="text-xl font-black font-mono text-foreground mt-1">
+            <AmountDisplay amount={totalVolume} size="md" className="font-bold" />
+          </div>
+          <div className="text-[10px] text-muted-foreground mt-0.5">{orders.length} orders displayed</div>
+        </div>
+      </div>
+
       {/* Filter Toolbar */}
-      <div className="flex flex-wrap items-center gap-3 bg-card p-3 rounded-lg border border-border/80 shadow-sm">
-        <div className="w-48">
+      <div className="flex flex-wrap items-center gap-3 bg-card p-3 rounded-xl border border-border/80 shadow-xs">
+        <div className="w-56">
           <Select
             value={statusFilter}
             onChange={(e) => {
@@ -176,10 +228,10 @@ export const OrderList: React.FC = () => {
             }}
             className="h-8 text-xs"
           >
-            <option value="">All Statuses</option>
-            <option value="PENDING">Pending</option>
-            <option value="DISPATCHED">Dispatched</option>
-            <option value="BILLED">Billed</option>
+            <option value="">All Statuses ({orders.length})</option>
+            <option value="PENDING">Pending Dispatch</option>
+            <option value="DISPATCHED">Dispatched (With Booker)</option>
+            <option value="BILLED">Billed & Settled</option>
             <option value="CANCELLED">Cancelled</option>
           </Select>
         </div>

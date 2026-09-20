@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { formatDateTime } from '@/lib/utils/date';
-import { Truck, Printer, Copy, CheckCircle } from 'lucide-react';
+import { Truck, Copy, CheckCircle } from 'lucide-react';
 
 interface SlipPreviewProps {
   slipId: number | null;
@@ -24,10 +24,6 @@ export const SlipPreview: React.FC<SlipPreviewProps> = ({
   onOpenChange,
 }) => {
   const { data: slip, isLoading } = useDispatchSlip(slipId || 0);
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   const handleCopy = () => {
     if (!slip) return;
@@ -136,21 +132,9 @@ export const SlipPreview: React.FC<SlipPreviewProps> = ({
             <span>Copy Text</span>
           </Button>
 
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handlePrint}
-              className="gap-1.5"
-            >
-              <Printer className="h-3.5 w-3.5" />
-              <span>Print Slip</span>
-            </Button>
-            <Button type="button" size="sm" onClick={() => onOpenChange(false)}>
-              Done
-            </Button>
-          </div>
+          <Button type="button" size="sm" onClick={() => onOpenChange(false)}>
+            Done
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

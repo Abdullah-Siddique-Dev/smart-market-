@@ -9,7 +9,8 @@ import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
 import { inventoryApi } from '@/lib/api/inventory.api';
 import { Product } from '@/types/entities';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { ShoppingBag, ScanBarcode, Sparkles } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { ScanBarcode, Sparkles, Command, Keyboard } from 'lucide-react';
 
 export const PosTerminal: React.FC = () => {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
@@ -62,20 +63,25 @@ export const PosTerminal: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4.5rem)] gap-3 p-3">
-      {/* Top Controls: Fast Product Search Bar & Scan Barcode Indicator */}
-      <div className="flex items-center gap-3 bg-card p-3 rounded-xl border border-border/80 shadow-sm">
-        <div className="flex-1">
-          <ProductSearch onSelect={handleProductSelect} autoFocus={true} />
+    <div className="flex flex-col h-[calc(100vh-4rem)] gap-3.5 p-4 bg-background">
+      {/* Top Controls: Fast Product Search Bar & Hardware Scanner Indicator */}
+      <div className="flex items-center gap-3 bg-card p-3 rounded-2xl border border-border shadow-xs">
+        <div className="flex-1 relative">
+          <ProductSearch
+            onSelect={handleProductSelect}
+            autoFocus={true}
+            placeholder="Search product catalog by SKU, name, or scan barcode (F2)..."
+          />
         </div>
 
-        <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/50 border border-border/60 text-xs text-muted-foreground shrink-0">
-          <ScanBarcode className="h-4 w-4 text-primary" />
+        <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/60 border border-border text-xs text-muted-foreground shrink-0 font-medium">
+          <ScanBarcode className="h-4 w-4 text-primary animate-pulse" />
           <span>Scanner Ready</span>
+          <span className="h-2 w-2 rounded-full bg-emerald-500 ml-1" />
         </div>
 
         {scanNotice && (
-          <div className="text-xs font-semibold text-primary animate-in fade-in flex items-center gap-1.5 bg-primary/10 px-3 py-2 rounded-lg">
+          <div className="text-xs font-semibold text-primary animate-in fade-in flex items-center gap-1.5 bg-primary/10 px-3 py-2 rounded-xl border border-primary/20">
             <Sparkles className="h-3.5 w-3.5" />
             <span>{scanNotice}</span>
           </div>
@@ -83,41 +89,45 @@ export const PosTerminal: React.FC = () => {
       </div>
 
       {/* Main Terminal Workspace: Left = Cart Items Table, Right = Summary & Checkout */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 flex-1 min-h-0">
-        {/* Left: Invoice Cart Table */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5 flex-1 min-h-0">
+        {/* Left: Invoice Cart Table (8 Columns) */}
         <div className="lg:col-span-8 flex flex-col h-full min-h-0">
           <InvoiceCart />
         </div>
 
-        {/* Right: Summary & Action Panel */}
-        <div className="lg:col-span-4 flex flex-col gap-3">
+        {/* Right: Summary & Action Panel (4 Columns) */}
+        <div className="lg:col-span-4 flex flex-col gap-3.5">
           <InvoiceSummary onCheckout={() => setIsPaymentOpen(true)} />
 
-          {/* POS Quick Reference Guide */}
-          <div className="p-3.5 rounded-xl border border-border/60 bg-muted/20 text-xs space-y-2 text-muted-foreground">
-            <div className="font-semibold text-foreground flex items-center gap-1.5">
-              <ShoppingBag className="h-4 w-4 text-primary" />
-              <span>POS Terminal Quick Keys</span>
+          {/* POS Terminal Keybindings Card */}
+          <Card className="p-4 rounded-2xl border-border bg-card shadow-xs text-xs space-y-2.5">
+            <div className="font-bold text-foreground flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Keyboard className="h-4 w-4 text-primary" />
+                <span>POS Quick Shortcuts</span>
+              </span>
+              <span className="text-[10px] text-muted-foreground font-mono font-medium">Hands-on-keyboard</span>
             </div>
-            <div className="grid grid-cols-2 gap-1.5 font-mono text-[11px]">
-              <div className="flex items-center justify-between p-1 rounded bg-background/60">
-                <span className="font-bold text-foreground">F1</span>
-                <span>Pay Bill</span>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div className="p-2 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between">
+                <span className="text-muted-foreground text-[11px]">Pay Bill</span>
+                <kbd>F1</kbd>
               </div>
-              <div className="flex items-center justify-between p-1 rounded bg-background/60">
-                <span className="font-bold text-foreground">F2</span>
-                <span>Search Item</span>
+              <div className="p-2 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between">
+                <span className="text-muted-foreground text-[11px]">Search Item</span>
+                <kbd>F2</kbd>
               </div>
-              <div className="flex items-center justify-between p-1 rounded bg-background/60">
-                <span className="font-bold text-foreground">Esc</span>
-                <span>Close Popup</span>
+              <div className="p-2 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between">
+                <span className="text-muted-foreground text-[11px]">Dismiss Dialog</span>
+                <kbd>Esc</kbd>
               </div>
-              <div className="flex items-center justify-between p-1 rounded bg-background/60">
-                <span className="font-bold text-foreground">Barcode</span>
-                <span>Instant Add</span>
+              <div className="p-2 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between">
+                <span className="text-muted-foreground text-[11px]">Barcode Scan</span>
+                <kbd>Auto</kbd>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       </div>
 

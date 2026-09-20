@@ -108,15 +108,18 @@ export const LedgerViewer: React.FC = () => {
   ];
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="flex flex-col gap-4 p-4 max-w-7xl mx-auto w-full">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <ShieldCheck className="h-6 w-6 text-primary" />
-            <span>Immutable Inventory Audit Ledger [F8]</span>
-          </h1>
-          <p className="text-xs text-muted-foreground">
+            <h1 className="text-xl font-bold tracking-tight text-foreground">
+              Immutable Inventory Audit Ledger
+            </h1>
+            <kbd className="kbd text-[10px]">F8</kbd>
+          </div>
+          <p className="text-xs text-muted-foreground mt-0.5">
             Cryptographically tracked append-only physical stock transactions and variance audits
           </p>
         </div>
