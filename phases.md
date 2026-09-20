@@ -51,72 +51,76 @@ Phase 14: Automated Local Backup, Hardening & Installer Packaging
 
 ## Phase 1: Foundation & Desktop Shell
 
-- **Goal:** Initialize the desktop application container and establish the frontend build pipeline.
-- **Scope:** Tauri 2.0 initialization, Vite + React 19 + TypeScript configuration, Tailwind CSS setup, and `shadcn/ui` base component library.
+- **Goal:** Initialize the desktop application container and establish the full-stack pipeline (Tauri 2.0 shell + Express API service + React frontend).
+- **Scope:** Tauri 2.0 initialization, Express.js backend setup with `cors` and `cookie-parser`, Vite + React 19 + TypeScript frontend, Tailwind CSS, and `shadcn/ui` base components.
 - **Expected Files/Modules:**
   - `src-tauri/tauri.conf.json`, `src-tauri/Cargo.toml`, `src-tauri/src/main.rs`
+  - `server/app.ts`, `server/server.ts`, `server/middleware/cors.ts`
   - `package.json`, `vite.config.ts`, `tailwind.config.js`, `tsconfig.json`
   - `src/components/ui/*` (Button, Input, Card, Dialog, Badge, Tabs)
   - `src/app/App.tsx`, `src/app/Layout.tsx`
 - **Dependencies:** None.
 - **Implementation Tasks:**
   1. Scaffold Tauri 2.0 app with React and TypeScript template.
-  2. Configure Tailwind CSS with enterprise neutral color palette.
-  3. Set up `shadcn/ui` and base components.
+  2. Set up local Express.js service with `cors` (configured for `tauri://localhost`), `cookie-parser`, and JSON body parser.
+  3. Configure Tailwind CSS with enterprise neutral color palette and install `shadcn/ui` base primitives.
   4. Build persistent app shell layout (Top status bar, collapsible sidebar, main viewport).
   5. Register global navigation hotkeys (`F1`–`F8`).
 - **Validation Tasks:**
   - App compiles and runs natively via `npm run tauri dev`.
-  - Window frame controls (minimize, maximize, close) function as expected.
+  - Frontend successfully makes a cross-origin HTTP test call to local Express server via `cors`.
   - Hotkeys successfully switch navigation views.
-- **Completion Criteria:** Standalone desktop window launches cleanly with zero console errors and sub-second startup time.
+- **Completion Criteria:** Standalone desktop window launches with connected local Express service and sub-second startup.
 
 ---
 
 ## Phase 2: Embedded Database & Schema Migration Engine
 
-- **Goal:** Establish a reliable, zero-config local SQLite persistence layer with automated migrations.
-- **Scope:** Database connection pooling via Tauri native plugins, schema migration scripts, SQLite pragmas enforcement (`WAL`, `foreign_keys`).
+- **Goal:** Establish a reliable, zero-config local SQLite persistence layer with automated migrations and pagination helpers.
+- **Scope:** SQLite database connection with `better-sqlite3` or `sqlx` in WAL mode, schema migrations, and universal pagination helper utility.
 - **Expected Files/Modules:**
-  - `src-tauri/src/db/mod.rs`
-  - `src-tauri/src/db/migrations/001_initial_schema.sql`
-  - `src/lib/db/client.ts`
+  - `server/db/connection.ts`
+  - `server/db/migrations/001_initial_schema.sql`
+  - `server/utils/paginate.ts`
   - `src/types/database.ts`
 - **Dependencies:** Phase 1.
 - **Implementation Tasks:**
-  1. Add `tauri-plugin-sql` (with SQLite feature) to Rust dependencies.
-  2. Implement database initialization hook that sets `PRAGMA journal_mode = WAL;` and `PRAGMA foreign_keys = ON;`.
-  3. Create versioned SQL migration runner executing on application launch.
-  4. Define complete table definitions from `datamodels.md`.
-  5. Create database health check command invokable by frontend.
+  1. Configure SQLite connection with `PRAGMA journal_mode = WAL;` and `PRAGMA foreign_keys = ON;`.
+  2. Implement database initialization script executing versioned migrations on launch.
+  3. Define complete table definitions from `datamodels.md`.
+  4. Build reusable server-side pagination helper: `paginate<T>(query, params, { page, limit })`.
 - **Validation Tasks:**
   - SQLite `.sqlite` file is created automatically in user's `%LOCALAPPDATA%` directory.
   - Foreign key constraints actively reject invalid inserts.
-  - WAL journal mode is verified via `PRAGMA journal_mode;`.
-- **Completion Criteria:** All tables, indexes, and constraints defined in `datamodels.md` exist and can be queried.
+  - Pagination utility calculates `totalPages`, `hasNextPage`, and slices records correctly.
+- **Completion Criteria:** All tables defined in `datamodels.md` exist and pagination utility passes verification tests.
 
 ---
 
-## Phase 3: Authentication & Role-Based Access Control (RBAC)
+## Phase 3: Authentication with Passport.js, Cookies & RBAC
 
-- **Goal:** Secure the private application and segregate sensitive cost/profit data.
-- **Scope:** Local user login (PIN/Password), session store, and role differentiation (`OWNER` vs `OPERATOR`).
+- **Goal:** Secure the application using Passport.js with session cookies and segregate sensitive cost/profit data.
+- **Scope:** `passport.js` local authentication, `cookie-parser` session handling, and role differentiation (`OWNER` vs `OPERATOR`).
 - **Expected Files/Modules:**
-  - `src-tauri/src/commands/auth.rs`
+  - `server/auth/passport.ts`
+  - `server/routes/auth.routes.ts`
+  - `server/middleware/auth.middleware.ts`
   - `src/stores/useAuthStore.ts`
   - `src/components/modules/auth/LoginModal.tsx`
   - `src/components/shared/RoleGuard.tsx`
 - **Dependencies:** Phase 2.
 - **Implementation Tasks:**
-  1. Create password hashing utility in Rust (Argon2 or bcrypt).
-  2. Implement seed logic for initial `OWNER` administrative account.
-  3. Create frontend login screen supporting quick numeric PIN or password.
-  4. Enforce frontend component guards hiding purchase costs and profit tabs from `OPERATOR` role.
-  5. Enforce backend command guards preventing unauthorized report queries.
+  1. Configure Passport.js with `passport-local` strategy: verifies username/password against Argon2/bcrypt hash.
+  2. Configure `express-session` with secure, HTTP-only cookies parsed by `cookie-parser`.
+  3. Implement login, logout, and `/api/auth/me` endpoints.
+  4. Create route authorization middleware: `ensureAuthenticated` and `requireRole('OWNER')`.
+  5. Enforce frontend component guards hiding purchase costs and profit tabs from `OPERATOR` role.
 - **Validation Tasks:**
-  - Logging in as `OPERATOR` completely hides the Profit/Report views and purchase price inputs.
-  - Logging in as `OWNER` enables all executive views and cost fields.
-- **Completion Criteria:** Users can authenticate; permissions are enforced at both the UI and native command layers.
+  - Logging in sets a secure HTTP-only cookie and authenticates the session via Passport.js.
+  - Unauthenticated requests to protected endpoints return `401 Unauthorized`.
+  - `OPERATOR` role completely hides the Profit/Report views and purchase price inputs.
+  - `OWNER` role enables all executive views and cost fields.
+- **Completion Criteria:** Users can authenticate via Passport.js session cookies, and RBAC is strictly enforced across the UI and API layers.
 
 ---
 

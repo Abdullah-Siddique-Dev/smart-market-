@@ -54,6 +54,14 @@
 - **Decision:** Direct ESC/POS thermal printing and physical printer driver integrations are deferred and temporarily excluded from the current scope.
 - **Rationale:** Streamlines core business validation (order booking, atomic inventory reduction, booker reconciliation, and profit calculations). Slips and bills will be generated, saved, and previewed digitally on-screen within the application.
 
+### ADR-07: Express.js Backend with Passport.js, Cookie-Parser & CORS
+- **Decision:** Implement a local Node.js / Express backend service layer connecting to the SQLite database, using `cors`, `cookie-parser`, and `passport.js` (Local Strategy with session cookies) for authentication and role management, with Tauri 2.0 hosting the desktop frontend shell.
+- **Rationale:** Enables full TypeScript/JavaScript across the entire stack, leverages mature authentication middleware (`passport.js` + `cookie-parser`), and safely handles desktop-to-API communication with `cors`.
+
+### ADR-08: Standardized Server-Side Pagination
+- **Decision:** Implement standardized server-side pagination (`page`, `limit` / `pageSize`, `totalCount`, `totalPages`) across all list endpoints (`products`, `orders`, `bills`, `retail_shops`, `inventory_ledger`).
+- **Rationale:** Wholesale businesses accumulate tens of thousands of records. Server-side pagination prevents memory bloat in the desktop webview, reduces SQLite I/O, and ensures smooth 60fps rendering in TanStack Table.
+
 ---
 
 ## 4. Current Implementation Status

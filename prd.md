@@ -130,7 +130,10 @@ Every requirement below is directly traceable to the provided business requireme
   - Source document reference (Bill #, Slip #, Import #)
   - User ID who performed the action
 - **REQ-AUD-02 (No Silent Stock Edits):** Manual stock adjustments (e.g. damages, shrinkage) must require mandatory justification notes and `OWNER` approval.
-- **REQ-AUD-03 (Bill Tampering Prevention):** Once a bill is printed and finalized, it cannot be deleted. Any correction must occur via a recorded Credit Note / Return Slip with an audit entry.
+- **REQ-AUD-03 (Bill Tampering Prevention):** Once a bill is finalized, it cannot be deleted. Any correction must occur via a recorded Credit Note / Return Slip with an audit entry.
+
+### 4.10 Data Navigation & Pagination
+- **REQ-PAG-01 (Server-Side Pagination):** All data listing interfaces (Products, Orders, Bills, Retail Shops, and Audit Ledger) must implement server-side pagination with configurable page sizes (25, 50, 100) to ensure high rendering speed and prevent memory overload.
 
 ---
 
@@ -138,7 +141,11 @@ Every requirement below is directly traceable to the provided business requireme
 
 ### 5.1 Deployment & Infrastructure
 - **NFR-DEP-01 (Zero Hosting / Zero VPS):** The system must operate 100% locally on the company's hardware. No cloud hosting, no virtual private servers (VPS), and no external server bills are required.
-- **NFR-DEP-02 (Offline-First):** Complete core operations (billing, stock updates, slip printing, reporting) must function without any internet connection.
+- **NFR-DEP-02 (Offline-First):** Complete core operations (billing, stock updates, slip generation, reporting) must function without any internet connection.
+
+### 5.2 Security & Authentication
+- **NFR-SEC-01 (Passport.js & Cookie Security):** Authentication is managed via Passport.js (Local Strategy) with HTTP-only, secure session cookies handled via `cookie-parser`.
+- **NFR-SEC-02 (CORS Protection):** Cross-Origin Resource Sharing (`cors`) is strictly configured to permit only trusted local application origins (`tauri://localhost`, local dev host).
 
 ### 5.2 Performance & Speed
 - **NFR-PERF-01 (Instant Billing):** Search and product selection during billing must return results in under 50ms for product catalogs up to 10,000 SKUs.

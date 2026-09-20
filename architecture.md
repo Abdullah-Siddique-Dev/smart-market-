@@ -97,29 +97,61 @@ src/
 
 ---
 
-## 4. Backend Architecture (Tauri 2.0 Rust Core)
+## 4. Backend & API Architecture
 
-The native backend runs as a compiled Rust executable hosting the native window and managing system-level privileges.
+The system utilizes an **Express.js (Node.js) API Service Layer** coupled with the **Tauri 2.0 Desktop Shell** and **SQLite Engine**, providing standard middleware security, robust session management, and cross-platform flexibility.
 
-### 4.1 Core Responsibilities
-1. **Lifecycle & Window Control:** Initializing the application window, window state preservation, and graceful shutdown.
-2. **Database Engine Management:** Managing the embedded SQLite connection, executing schema migrations on launch, and enforcing SQLite pragmas.
-3. **Digital Slips & Invoice Generation:** Generating serialized digital dispatch gate-passes and wholesale invoices for on-screen preview (physical hardware ESC/POS printing is deferred for the time being).
-4. **Automated Backup Service:** Executing a background task upon application shutdown or daily schedule to create timestamped snapshot copies of `smart_market.sqlite`.
-5. **Secure Authentication:** Hashing credentials using Argon2/bcrypt and managing authenticated local sessions.
-
-### 4.2 IPC (Inter-Process Communication) Architecture
-Communication between the frontend and Rust core occurs over Tauri's asynchronous binary IPC mechanism (`invoke`):
+### 4.1 Server Middleware & Security Stack
+- **`cors`:** Configures Cross-Origin Resource Sharing allowing authorized desktop origins (e.g. `tauri://localhost`, `http://localhost:5173` in development) to access the local API with credentials.
+- **`cookie-parser`:** Parses HTTP-only, secure cookies for session token management and protection against client-side script tampering.
+- **`passport.js`:** Manages user authentication via `passport-local` strategy:
+  - Validates username/password or PIN against Argon2/bcrypt hashes.
+  - Serializes/deserializes user sessions stored locally in SQLite.
+  - Enforces role-based route middleware (`ensureAuthenticated`, `requireRole('OWNER')`).
 
 ```typescript
-// IPC Contract Standard: Standardized Response Envelope
-interface ApiResponse<T> {
+// Express Backend Middleware Pipeline
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import passport from 'passport';
+import session from 'express-session';
+
+const app = express();
+
+app.use(cors({
+  origin: ['tauri://localhost', 'http://localhost:5173'],
+  credentials: true,
+}));
+app.use(cookieParser());
+app.use(express.json());
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'smart-market-local-secret',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { httpOnly: true, secure: false, maxAge: 24 * 60 * 60 * 1000 }
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+```
+
+### 4.2 Standardized Pagination Architecture
+To maintain sub-50ms UI performance across thousands of products, orders, bills, and audit records, all listing endpoints implement server-side pagination:
+
+- **Query Parameters:** `page` (default `1`), `limit` (default `25`, max `100`), `search`, `sortBy`, `sortOrder`.
+- **SQL Implementation:** Efficient `LIMIT :limit OFFSET :offset` queries coupled with indexed `COUNT(*)` over total matching records.
+- **Paginated Response Envelope:**
+```typescript
+interface PaginatedResponse<T> {
   success: boolean;
-  data?: T;
-  error?: {
-    code: string;
-    message: string;
-    details?: unknown;
+  data: T[];
+  pagination: {
+    page: number;
+    limit: number;
+    totalRecords: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
   };
 }
 ```
