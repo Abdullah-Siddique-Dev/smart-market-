@@ -28,7 +28,7 @@ export const ExportButton: React.FC = () => {
         'Balance After',
         'Reference Type',
         'Reference ID',
-        'Operator',
+        'Logged By',
         'Notes',
       ];
 

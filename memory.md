@@ -66,8 +66,12 @@
 - **Rationale:** Wholesale businesses accumulate tens of thousands of records. Server-side pagination prevents memory bloat in the desktop webview, reduces SQLite I/O, and ensures smooth 60fps rendering.
 
 ### ADR-09: Single Unified Owner Console & Manual Order Intake (WhatsApp / In-Person)
-- **Decision:** Consolidate all ERP capabilities into a **single, unified Owner/Operator dashboard**. Eliminate any double-sided portal architecture (NO Order Booker portal or customer-facing apps).
-- **Rationale:** Per business specification, field order bookers communicate order details verbally in-person or via WhatsApp messages/photos. The counter operator manually keys these orders into the central system. Order bookers are represented only as attribution and reconciliation entities within the database, without login credentials.
+- **Decision:** Consolidate all ERP capabilities into a **single, unified Owner dashboard**. Eliminate any double-sided portal architecture (NO Order Booker portal or customer-facing apps).
+- **Rationale:** Per business specification, field order bookers communicate order details verbally in-person or via WhatsApp messages/photos. The owner/operator manually keys these orders into the central system. Order bookers are represented only as attribution and reconciliation entities within the database, without login credentials.
+
+### ADR-10: Strictly Single-Sided - Owner Console Only (No Operator Role)
+- **Decision:** Eliminate the `OPERATOR` role tier entirely. The application operates strictly as a **Single-Sided Wholesale Owner Dashboard** where all ERP modules, inventory purchase costs, landed profit calculations, and audit logs are unconditionally available without role restrictions.
+- **Rationale:** The wholesale owner requested a single dashboard with all features implemented directly on the owner side, without multi-user role boundaries or restricted operator modes. All features (F1 through F8) are unlocked directly.
 
 ---
 

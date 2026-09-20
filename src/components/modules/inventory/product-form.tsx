@@ -28,9 +28,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({
   onOpenChange,
   onSuccess,
 }) => {
-  const user = useAuthStore((state) => state.user);
-  const isOwner = user?.role === 'OWNER';
-
   const [sku, setSku] = useState('');
   const [name, setName] = useState('');
   const [unit, setUnit] = useState('BOX');
@@ -76,7 +73,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
     }
 
     const pp = parseFloat(purchasePrice);
-    if (isOwner && !isEditing && (isNaN(pp) || pp < 0)) {
+    if (!isEditing && (isNaN(pp) || pp < 0)) {
       setError('Please enter a valid initial purchase price');
       return;
     }
@@ -91,7 +88,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({
             name: name.trim(),
             unit: unit.trim(),
             selling_price: sp,
-            ...(isOwner && !isNaN(pp) ? { purchase_price: pp } : {}),
+            ...(!isNaN(pp) ? { purchase_price: pp } : {}),
             min_stock_alert: parseInt(minStockAlert, 10) || 10,
           },
         });
@@ -194,31 +191,22 @@ export const ProductForm: React.FC<ProductFormProps> = ({
               />
             </div>
 
-            {/* Purchase Price: restricted to OWNER role */}
-            {isOwner ? (
-              <div className="space-y-1">
-                <label className="font-semibold text-muted-foreground">
-                  Purchase / Cost Price (Rs.) *
-                </label>
-                <Input
-                  type="number"
-                  min="0"
-                  step="0.5"
-                  placeholder="0.00"
-                  value={purchasePrice}
-                  onChange={(e) => setPurchasePrice(e.target.value)}
-                  className="font-mono text-xs"
-                  required={!isEditing}
-                />
-              </div>
-            ) : (
-              <div className="space-y-1">
-                <label className="font-semibold text-muted-foreground">Purchase Cost</label>
-                <div className="h-9 px-3 flex items-center bg-muted/50 rounded-md border border-input text-xs text-muted-foreground italic">
-                  Protected (Owner only)
-                </div>
-              </div>
-            )}
+            {/* Purchase Price */}
+            <div className="space-y-1">
+              <label className="font-semibold text-muted-foreground">
+                Purchase / Cost Price (Rs.) *
+              </label>
+              <Input
+                type="number"
+                min="0"
+                step="0.5"
+                placeholder="0.00"
+                value={purchasePrice}
+                onChange={(e) => setPurchasePrice(e.target.value)}
+                className="font-mono text-xs"
+                required={!isEditing}
+              />
+            </div>
           </div>
 
           <div className="space-y-1">

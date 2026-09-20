@@ -30,7 +30,6 @@ import { cn } from '@/lib/utils/cn';
 export const AppLayout: React.FC = () => {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
-  const isOwner = user?.role === 'OWNER';
 
   const sidebarCollapsed = useUiStore((state) => state.sidebarCollapsed);
   const toggleSidebar = useUiStore((state) => state.toggleSidebar);
@@ -60,12 +59,8 @@ export const AppLayout: React.FC = () => {
     { to: '/inventory', label: 'Inventory', key: 'F4', icon: Boxes },
     { to: '/bookers', label: 'Order Bookers', key: 'F5', icon: Users },
     { to: '/shops', label: 'Shops & Khata', key: 'F6', icon: Store },
-    ...(isOwner
-      ? [
-          { to: '/reports', label: 'Profit Reports', key: 'F7', icon: BarChart3 },
-          { to: '/audit', label: 'Audit Ledger', key: 'F8', icon: ShieldCheck },
-        ]
-      : []),
+    { to: '/reports', label: 'Profit Reports', key: 'F7', icon: BarChart3 },
+    { to: '/audit', label: 'Audit Ledger', key: 'F8', icon: ShieldCheck },
     { to: '/settings', label: 'Settings', key: null, icon: Settings },
   ];
 
@@ -243,13 +238,10 @@ export const AppLayout: React.FC = () => {
                   </div>
                 </div>
                 <Badge
-                  variant={isOwner ? 'default' : 'secondary'}
-                  className={cn(
-                    'text-[10px] font-mono tracking-wider font-bold ml-1',
-                    isOwner ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                  )}
+                  variant="default"
+                  className="text-[10px] font-mono tracking-wider font-bold ml-1 bg-primary text-primary-foreground"
                 >
-                  {user.role}
+                  OWNER
                 </Badge>
               </div>
             )}

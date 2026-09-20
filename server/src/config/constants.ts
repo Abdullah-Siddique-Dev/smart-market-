@@ -1,6 +1,5 @@
 export const USER_ROLES = {
   OWNER: 'OWNER',
-  OPERATOR: 'OPERATOR',
 } as const;
 
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES];

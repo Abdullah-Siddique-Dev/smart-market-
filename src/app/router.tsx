@@ -39,21 +39,6 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   return <>{children}</>;
 };
 
-interface RoleGuardProps {
-  children: React.ReactNode;
-  requiredRole: 'OWNER';
-}
-
-const RoleGuard: React.FC<RoleGuardProps> = ({ children, requiredRole }) => {
-  const { user } = useAuthStore();
-
-  if (user?.role !== requiredRole) {
-    return <Navigate to="/billing" replace />;
-  }
-
-  return <>{children}</>;
-};
-
 export const AppRouter: React.FC = () => {
   return (
     <Routes>
@@ -76,22 +61,8 @@ export const AppRouter: React.FC = () => {
         <Route path="inventory" element={<ProductList />} />
         <Route path="bookers" element={<BookerList />} />
         <Route path="shops" element={<ShopList />} />
-        <Route
-          path="reports"
-          element={
-            <RoleGuard requiredRole="OWNER">
-              <ProfitDashboard />
-            </RoleGuard>
-          }
-        />
-        <Route
-          path="audit"
-          element={
-            <RoleGuard requiredRole="OWNER">
-              <LedgerViewer />
-            </RoleGuard>
-          }
-        />
+        <Route path="reports" element={<ProfitDashboard />} />
+        <Route path="audit" element={<LedgerViewer />} />
         <Route path="settings" element={<SystemSettings />} />
       </Route>
 

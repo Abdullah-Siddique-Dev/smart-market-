@@ -93,7 +93,7 @@ export const LedgerViewer: React.FC = () => {
       className: 'font-mono font-bold text-xs text-right w-28',
     },
     {
-      header: 'Operator',
+      header: 'Logged By',
       accessorKey: 'performer_name',
       className: 'text-xs text-muted-foreground',
     },

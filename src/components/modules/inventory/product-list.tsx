@@ -13,9 +13,6 @@ import { Input } from '@/components/ui/input';
 import { Plus, Download, Edit, Search, Package } from 'lucide-react';
 
 export const ProductList: React.FC = () => {
-  const user = useAuthStore((state) => state.user);
-  const isOwner = user?.role === 'OWNER';
-
   const [page, setPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -70,21 +67,17 @@ export const ProductList: React.FC = () => {
         <AmountDisplay amount={p.selling_price} size="sm" className="font-semibold font-mono" />
       ),
     },
-    ...(isOwner
-      ? [
-          {
-            header: 'Cost Rate',
-            className: 'text-right w-28',
-            cell: (p: Product) => (
-              <AmountDisplay
-                amount={p.purchase_price}
-                size="sm"
-                className="text-muted-foreground font-mono"
-              />
-            ),
-          },
-        ]
-      : []),
+    {
+      header: 'Cost Rate',
+      className: 'text-right w-28',
+      cell: (p: Product) => (
+        <AmountDisplay
+          amount={p.purchase_price}
+          size="sm"
+          className="text-muted-foreground font-mono"
+        />
+      ),
+    },
     {
       header: 'Stock Status',
       className: 'text-center w-36',

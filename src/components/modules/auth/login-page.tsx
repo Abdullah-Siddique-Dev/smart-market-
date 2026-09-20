@@ -69,9 +69,9 @@ export const LoginPage: React.FC = () => {
         {/* Login Form Card */}
         <Card className="border-border/80 shadow-xl backdrop-blur-sm bg-card/95">
           <CardHeader className="pb-4">
-            <CardTitle className="text-lg">Sign In to Terminal</CardTitle>
+            <CardTitle className="text-lg">Sign In to Owner Console</CardTitle>
             <CardDescription className="text-xs">
-              Enter your authorized staff credentials to continue
+              Enter authorized wholesale owner credentials to continue
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -88,7 +88,7 @@ export const LoginPage: React.FC = () => {
                 </label>
                 <Input
                   type="text"
-                  placeholder="e.g. admin or operator"
+                  placeholder="e.g. admin"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   disabled={isLoading}
@@ -124,33 +124,26 @@ export const LoginPage: React.FC = () => {
               </Button>
             </form>
 
-            {/* Quick Login Helpers for Development & Initial Setup */}
+            {/* Quick Login Helper */}
             <div className="mt-6 pt-5 border-t border-border/60">
               <p className="text-[11px] font-semibold text-muted-foreground mb-2.5 uppercase tracking-wider text-center">
-                Pre-configured Local Profiles
+                Wholesale Owner Profile
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('admin', 'admin123')}
-                  className="flex flex-col items-start p-2.5 rounded-lg border border-border/80 bg-muted/40 hover:bg-primary/5 hover:border-primary/40 transition-all text-left group"
-                >
-                  <span className="text-xs font-bold text-foreground group-hover:text-primary">
-                    Owner / Admin
-                  </span>
-                  <span className="text-[10px] text-muted-foreground">Full ERP Access</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickLogin('operator', 'operator123')}
-                  className="flex flex-col items-start p-2.5 rounded-lg border border-border/80 bg-muted/40 hover:bg-primary/5 hover:border-primary/40 transition-all text-left group"
-                >
-                  <span className="text-xs font-bold text-foreground group-hover:text-primary">
-                    POS Operator
-                  </span>
-                  <span className="text-[11px] text-muted-foreground">Billing & Orders Only</span>
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => handleQuickLogin('admin', 'admin123')}
+                className="w-full flex items-center justify-between p-3 rounded-xl border border-primary/30 bg-primary/5 hover:bg-primary/10 transition-all text-left group"
+              >
+                <div>
+                  <div className="text-xs font-bold text-foreground group-hover:text-primary">
+                    Wholesale Owner (admin)
+                  </div>
+                  <div className="text-[10px] text-muted-foreground">Default credentials: admin / admin123</div>
+                </div>
+                <span className="text-[10px] font-bold font-mono px-2 py-0.5 rounded bg-primary/20 text-primary">
+                  Click to Fill
+                </span>
+              </button>
             </div>
           </CardContent>
         </Card>

@@ -1,12 +1,7 @@
 import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate } from 'react-router-dom';
-import { useAuthStore } from '@/stores/auth.store';
-import { USER_ROLES } from '@/types/enums';
-
 export function useGlobalShortcuts(onF10?: () => void) {
   const navigate = useNavigate();
-  const { user } = useAuthStore();
-  const isOwner = user?.role === USER_ROLES.OWNER;
 
   // F1: Billing POS
   useHotkeys('f1', (e) => {
@@ -44,20 +39,16 @@ export function useGlobalShortcuts(onF10?: () => void) {
     navigate('/shops');
   });
 
-  // F7: Reports (Owner Only)
+  // F7: Profit Reports
   useHotkeys('f7', (e) => {
     e.preventDefault();
-    if (isOwner) {
-      navigate('/reports');
-    }
+    navigate('/reports');
   });
 
-  // F8: Audit Ledger (Owner Only)
+  // F8: Audit Ledger
   useHotkeys('f8', (e) => {
     e.preventDefault();
-    if (isOwner) {
-      navigate('/audit');
-    }
+    navigate('/audit');
   });
 
   // F10: Checkout / Save Action

@@ -6,7 +6,6 @@ import { authApi } from '@/lib/api/auth.api';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Select } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import {
   Database,
@@ -25,7 +24,6 @@ import {
 
 export const SystemSettings: React.FC = () => {
   const user = useAuthStore((state) => state.user);
-  const isOwner = user?.role === 'OWNER';
   const theme = useUiStore((state) => state.theme);
   const toggleTheme = useUiStore((state) => state.toggleTheme);
 
@@ -37,7 +35,6 @@ export const SystemSettings: React.FC = () => {
   const [newUsername, setNewUsername] = useState('');
   const [newFullName, setNewFullName] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [newRole, setNewRole] = useState<'OPERATOR' | 'OWNER'>('OPERATOR');
   const [userError, setUserError] = useState<string | null>(null);
   const [userSuccess, setUserSuccess] = useState<string | null>(null);
 
@@ -75,10 +72,10 @@ export const SystemSettings: React.FC = () => {
         username: newUsername.trim(),
         password: newPassword.trim(),
         full_name: newFullName.trim(),
-        role: newRole,
+        role: 'OWNER',
       });
 
-      setUserSuccess(`Staff profile created for "${newUsername}"`);
+      setUserSuccess(`Owner account created for "${newUsername}"`);
       setNewUsername('');
       setNewFullName('');
       setNewPassword('');
@@ -213,114 +210,104 @@ export const SystemSettings: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* 2. Staff & User Management (Owner Only) */}
-      {isOwner && (
-        <Card className="border-border/80 shadow-xs">
-          <CardHeader className="pb-3 border-b border-border/60">
-            <CardTitle className="text-sm font-bold flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-primary" />
-              <span>Authorized Staff Accounts & Roles</span>
-            </CardTitle>
-            <CardDescription className="text-xs">
-              Manage operators (POS terminal access) and owners (full access)
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-4 space-y-4 text-xs">
-            {/* Registered Users Table */}
-            <div className="border border-border/80 rounded-lg overflow-hidden">
-              <table className="w-full text-left">
-                <thead className="bg-muted/60 text-[10px] font-semibold text-muted-foreground uppercase border-b border-border/60">
-                  <tr>
-                    <th className="p-2.5">Full Name</th>
-                    <th className="p-2.5">Username</th>
-                    <th className="p-2.5">Role</th>
-                    <th className="p-2.5">Status</th>
+      {/* 2. Owner & Admin User Management */}
+      <Card className="border-border/80 shadow-xs">
+        <CardHeader className="pb-3 border-b border-border/60">
+          <CardTitle className="text-sm font-bold flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-primary" />
+            <span>Authorized Wholesale Owner Accounts</span>
+          </CardTitle>
+          <CardDescription className="text-xs">
+            Manage authenticated owner accounts with full system, ERP, and profit report access
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-4 space-y-4 text-xs">
+          {/* Registered Users Table */}
+          <div className="border border-border/80 rounded-lg overflow-hidden">
+            <table className="w-full text-left">
+              <thead className="bg-muted/60 text-[10px] font-semibold text-muted-foreground uppercase border-b border-border/60">
+                <tr>
+                  <th className="p-2.5">Full Name</th>
+                  <th className="p-2.5">Username</th>
+                  <th className="p-2.5">Role</th>
+                  <th className="p-2.5">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border/40">
+                {users.map((u) => (
+                  <tr key={u.id} className="hover:bg-muted/20">
+                    <td className="p-2.5 font-semibold text-foreground">{u.full_name}</td>
+                    <td className="p-2.5 font-mono text-muted-foreground">{u.username}</td>
+                    <td className="p-2.5">
+                      <Badge
+                        variant="default"
+                        className="text-[10px]"
+                      >
+                        OWNER
+                      </Badge>
+                    </td>
+                    <td className="p-2.5">
+                      <span className="text-emerald-600 font-semibold">Active</span>
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="divide-y divide-border/40">
-                  {users.map((u) => (
-                    <tr key={u.id} className="hover:bg-muted/20">
-                      <td className="p-2.5 font-semibold text-foreground">{u.full_name}</td>
-                      <td className="p-2.5 font-mono text-muted-foreground">{u.username}</td>
-                      <td className="p-2.5">
-                        <Badge
-                          variant={u.role === 'OWNER' ? 'default' : 'secondary'}
-                          className="text-[10px]"
-                        >
-                          {u.role}
-                        </Badge>
-                      </td>
-                      <td className="p-2.5">
-                        <span className="text-emerald-600 font-semibold">Active</span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Create New Staff User */}
+          <form onSubmit={handleCreateUser} className="p-4 rounded-xl border border-border/80 bg-muted/20 space-y-3">
+            <div className="font-bold text-xs text-foreground flex items-center gap-2">
+              <UserPlus className="h-4 w-4 text-primary" />
+              <span>Register Additional Owner Profile</span>
             </div>
 
-            {/* Create New Staff User */}
-            <form onSubmit={handleCreateUser} className="p-4 rounded-xl border border-border/80 bg-muted/20 space-y-3">
-              <div className="font-bold text-xs text-foreground flex items-center gap-2">
-                <UserPlus className="h-4 w-4 text-primary" />
-                <span>Create New Staff Account</span>
+            {userError && (
+              <div className="p-2 rounded bg-destructive/10 text-destructive text-xs">
+                {userError}
               </div>
-
-              {userError && (
-                <div className="p-2 rounded bg-destructive/10 text-destructive text-xs">
-                  {userError}
-                </div>
-              )}
-              {userSuccess && (
-                <div className="p-2 rounded bg-emerald-50 text-emerald-700 text-xs">
-                  {userSuccess}
-                </div>
-              )}
-
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-2.5">
-                <Input
-                  type="text"
-                  placeholder="Full Name"
-                  value={newFullName}
-                  onChange={(e) => setNewFullName(e.target.value)}
-                  className="h-8 text-xs"
-                  required
-                />
-                <Input
-                  type="text"
-                  placeholder="Username"
-                  value={newUsername}
-                  onChange={(e) => setNewUsername(e.target.value)}
-                  className="h-8 text-xs"
-                  required
-                />
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  className="h-8 text-xs"
-                  required
-                />
-                <Select
-                  value={newRole}
-                  onChange={(e) => setNewRole(e.target.value as any)}
-                  className="h-8 text-xs"
-                >
-                  <option value="OPERATOR">OPERATOR (POS Only)</option>
-                  <option value="OWNER">OWNER (Full Admin)</option>
-                </Select>
+            )}
+            {userSuccess && (
+              <div className="p-2 rounded bg-emerald-50 text-emerald-700 text-xs">
+                {userSuccess}
               </div>
+            )}
 
-              <div className="flex justify-end">
-                <Button type="submit" size="sm" disabled={createUser.isPending} className="font-semibold text-xs">
-                  {createUser.isPending ? 'Creating...' : 'Create Account'}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
+              <Input
+                type="text"
+                placeholder="Full Name"
+                value={newFullName}
+                onChange={(e) => setNewFullName(e.target.value)}
+                className="h-8 text-xs"
+                required
+              />
+              <Input
+                type="text"
+                placeholder="Username"
+                value={newUsername}
+                onChange={(e) => setNewUsername(e.target.value)}
+                className="h-8 text-xs"
+                required
+              />
+              <Input
+                type="password"
+                placeholder="Password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                className="h-8 text-xs"
+                required
+              />
+            </div>
+
+            <div className="flex justify-end">
+              <Button type="submit" size="sm" disabled={createUser.isPending} className="font-semibold text-xs">
+                {createUser.isPending ? 'Creating...' : 'Register Owner'}
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
 
       {/* 3. Change Account Password */}
       <Card className="border-border/80 shadow-xs">
@@ -330,7 +317,7 @@ export const SystemSettings: React.FC = () => {
             <span>Update Account Password</span>
           </CardTitle>
           <CardDescription className="text-xs">
-            Change credentials for logged-in user: {user?.username} ({user?.role})
+            Change credentials for logged-in user: {user?.username} (OWNER)
           </CardDescription>
         </CardHeader>
         <CardContent className="pt-4 text-xs">

@@ -6,8 +6,7 @@ import { USER_ROLES } from '../config/constants.js';
 export class ProductController {
   static getProducts(req: Request, res: Response, next: NextFunction): void {
     try {
-      const isOwner = req.user?.role === USER_ROLES.OWNER;
-      const result = ProductService.getProducts(req.query, isOwner);
+      const result = ProductService.getProducts(req.query, true);
       res.json(result);
     } catch (error) {
       next(error);
@@ -17,8 +16,7 @@ export class ProductController {
   static getProductById(req: Request, res: Response, next: NextFunction): void {
     try {
       const id = parseInt(req.params.id, 10);
-      const isOwner = req.user?.role === USER_ROLES.OWNER;
-      const product = ProductService.getProductById(id, isOwner);
+      const product = ProductService.getProductById(id, true);
       res.json(successResponse(product));
     } catch (error) {
       next(error);

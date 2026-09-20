@@ -83,6 +83,9 @@ export function runMigrations(): void {
       db.pragma('foreign_keys = ON');
       console.log('✅ [Database] Migrated bills table: order_booker_id is now nullable.');
     }
+
+    // Upgrade all existing system users to OWNER role
+    db.exec("UPDATE system_users SET role = 'OWNER' WHERE role != 'OWNER';");
   } catch (err) {
     console.warn('Migration check warning:', err);
   }

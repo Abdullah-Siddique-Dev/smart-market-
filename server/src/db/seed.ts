@@ -21,19 +21,8 @@ export async function seedDatabase(): Promise<void> {
     console.log('🌱 [Database Seed] Created default OWNER account: admin / admin123');
   }
 
-  const existingOperator = db
-    .prepare('SELECT id FROM system_users WHERE role = ? LIMIT 1')
-    .get(USER_ROLES.OPERATOR);
-
-  if (!existingOperator) {
-    const opHash = await hashPassword('operator123');
-    db.prepare(`
-      INSERT INTO system_users (username, password_hash, full_name, role, is_active)
-      VALUES (?, ?, ?, ?, 1)
-    `).run('operator', opHash, 'Billing Operator', USER_ROLES.OPERATOR);
-
-    console.log('🌱 [Database Seed] Created default OPERATOR account: operator / operator123');
-  }
+  // Ensure any existing user accounts have OWNER role
+  db.exec("UPDATE system_users SET role = 'OWNER' WHERE role != 'OWNER';");
 
   console.log('✅ [Database Seed] Seeding completed.');
 }
