@@ -3,6 +3,7 @@ import { OrderService } from '../services/order.service.js';
 import { DispatchSlipService } from '../services/dispatchSlip.service.js';
 import { BillService } from '../services/bill.service.js';
 import { successResponse } from '../utils/response.js';
+import { AppError } from '../middleware/error.middleware.js';
 
 export class OrderController {
   static getOrders(req: Request, res: Response, next: NextFunction): void {
@@ -63,6 +64,10 @@ export class OrderController {
       const id = parseInt(req.params.id, 10);
       const order = OrderService.getOrderById(id);
       const userId = req.user!.id;
+
+      if (!order.order_booker_id) {
+        throw new AppError('Cannot dispatch an order without an assigned Order Booker', 400, 'NO_BOOKER_ASSIGNED');
+      }
 
       const slip = DispatchSlipService.generateSlip({
         order_booker_id: order.order_booker_id,

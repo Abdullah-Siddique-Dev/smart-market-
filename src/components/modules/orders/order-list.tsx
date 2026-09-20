@@ -48,7 +48,7 @@ export const OrderList: React.FC = () => {
 
     resetCart();
     setShop(order.shop_id);
-    setBooker(order.order_booker_id);
+    setBooker(order.order_booker_id ?? null);
     setLinkedOrder(order.id);
 
     if (order.items && order.items.length > 0) {

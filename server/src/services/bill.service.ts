@@ -13,7 +13,7 @@ export interface BillItemInput {
 export interface CreateBillRequest {
   order_id?: number;
   shop_id: number;
-  order_booker_id: number;
+  order_booker_id?: number | null;
   items: BillItemInput[];
   discount_amount?: number;
   payment_status: PaymentStatus;
@@ -40,8 +40,8 @@ export interface BillDetails {
   shop_name: string;
   shop_phone: string | null;
   shop_address: string | null;
-  order_booker_id: number;
-  booker_name: string;
+  order_booker_id?: number | null;
+  booker_name?: string | null;
   bill_date: string;
   subtotal: number;
   discount_amount: number;
@@ -100,10 +100,10 @@ export class BillService {
 
     const dataSql = `
       SELECT b.*, s.shop_name, s.phone as shop_phone, s.address as shop_address,
-             bk.name as booker_name, u.full_name as creator_name
+             COALESCE(bk.name, 'Direct Counter') as booker_name, u.full_name as creator_name
       FROM bills b
       JOIN retail_shops s ON b.shop_id = s.id
-      JOIN order_bookers bk ON b.order_booker_id = bk.id
+      LEFT JOIN order_bookers bk ON b.order_booker_id = bk.id
       JOIN system_users u ON b.created_by = u.id
       ${whereClause}
       ORDER BY b.id DESC
@@ -113,7 +113,7 @@ export class BillService {
       SELECT COUNT(*) as count
       FROM bills b
       JOIN retail_shops s ON b.shop_id = s.id
-      JOIN order_bookers bk ON b.order_booker_id = bk.id
+      LEFT JOIN order_bookers bk ON b.order_booker_id = bk.id
       ${whereClause}
     `;
 
@@ -130,10 +130,10 @@ export class BillService {
     const bill = db
       .prepare(`
         SELECT b.*, s.shop_name, s.phone as shop_phone, s.address as shop_address,
-               bk.name as booker_name, u.full_name as creator_name
+               COALESCE(bk.name, 'Direct Counter') as booker_name, u.full_name as creator_name
         FROM bills b
         JOIN retail_shops s ON b.shop_id = s.id
-        JOIN order_bookers bk ON b.order_booker_id = bk.id
+        LEFT JOIN order_bookers bk ON b.order_booker_id = bk.id
         JOIN system_users u ON b.created_by = u.id
         WHERE b.id = ?
       `)
@@ -167,8 +167,11 @@ export class BillService {
       | undefined;
     if (!shop) throw new AppError('Retail shop not found', 404, 'SHOP_NOT_FOUND');
 
-    const booker = db.prepare('SELECT id FROM order_bookers WHERE id = ?').get(data.order_booker_id);
-    if (!booker) throw new AppError('Order booker not found', 404, 'BOOKER_NOT_FOUND');
+    let bookerId: number | null = data.order_booker_id || null;
+    if (bookerId) {
+      const booker = db.prepare('SELECT id FROM order_bookers WHERE id = ?').get(bookerId);
+      if (!booker) throw new AppError('Order booker not found', 404, 'BOOKER_NOT_FOUND');
+    }
 
     const billNumber = `INV-${Date.now().toString().slice(-6)}`;
     const stockWarnings: string[] = [];
@@ -210,7 +213,7 @@ export class BillService {
 
         if (product.current_stock < item.quantity) {
           throw new AppError(
-            `Insufficient warehouse stock for "${product.name}" (${product.sku}). Requested: ${item.quantity}, Available: ${product.current_stock}`,
+            `Insufficient stock for "${product.name}" (${product.sku}). Available: ${product.current_stock}, Requested: ${item.quantity}`,
             400,
             'INSUFFICIENT_STOCK'
           );
@@ -221,15 +224,15 @@ export class BillService {
         const newStock = product.current_stock - item.quantity;
 
         if (newStock <= product.min_stock_alert) {
-          stockWarnings.push(`"${product.name}" is now at low stock: ${newStock} remaining.`);
+          stockWarnings.push(`Low stock alert: "${product.name}" remaining stock is ${newStock}`);
         }
 
         subtotal += lineTotal;
         validatedItems.push({
-          product_id: product.id,
+          product_id: item.product_id,
           quantity: item.quantity,
           unit_selling_price: item.unit_selling_price,
-          unit_purchase_price: product.purchase_price, // SNAPSHOT landed cost
+          unit_purchase_price: product.purchase_price,
           line_total: lineTotal,
           line_profit: lineProfit,
           new_stock: newStock,
@@ -250,7 +253,7 @@ export class BillService {
           billNumber,
           data.order_id || null,
           data.shop_id,
-          data.order_booker_id,
+          bookerId,
           subtotal,
           discount,
           netAmount,

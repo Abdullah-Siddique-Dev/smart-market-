@@ -1,307 +1,118 @@
 # System Architecture Document — Smart Market OS
+## Unified Single-Desk Wholesale Management System
+
+---
 
 ## 1. Executive Summary & Architectural Goals
 
-**Smart Market OS** is engineered as an **Offline-First, Desktop-Native Enterprise Application** specifically designed for a wholesale import and distribution business. It operates entirely on-premises without requiring cloud hosting, external database servers, or monthly VPS infrastructure fees.
+**Smart Market OS** is an **Offline-First, Single-Desk Enterprise Management System** purpose-built for wholesale import and distribution businesses. It operates completely on-premises without requiring cloud hosting, external database clusters, or recurring subscription fees.
 
-### Key Architectural Pillars
-1. **Zero External Server Dependency:** 100% self-contained desktop deployment using an embedded SQLite database engine.
-2. **ACID Financial & Inventory Integrity:** Transactional boundaries ensure billing and inventory deductions are atomic.
-3. **High-Speed Keyboard Ergonomics:** Sub-50ms UI response times for high-volume wholesale counter billing.
-4. **Tamper-Evident Anti-Corruption Architecture:** Append-only inventory transaction logging to prevent theft and unauthorized adjustments.
-5. **Ultra-Lightweight Footprint:** Memory usage under 80MB using Tauri 2.0 and native WebView2.
-
----
-
-## 2. Overall System Architecture
-
-The application adopts a **Two-Tier Native Desktop Architecture** consisting of a **React/TypeScript Presentation Layer** and a **Rust-Powered Tauri Host Layer**, accessing an **Embedded SQLite Database Engine**.
-
-```
-┌────────────────────────────────────────────────────────────────────────┐
-│               PRESENTATION LAYER (Webview2 / React 19)                 │
-│                                                                        │
-│  ┌───────────────────────┐  ┌──────────────────┐  ┌─────────────────┐  │
-│  │ Wholesale Billing POS │  │ Order & Dispatch │  │ Profit Reports  │  │
-│  └───────────┬───────────┘  └────────┬─────────┘  └────────┬────────┘  │
-│              │                       │                     │           │
-│  ┌───────────▼───────────────────────▼─────────────────────▼────────┐  │
-│  │               Client State & Data Access Layer                   │  │
-│  │   • Zustand (Session/Cart)       • TanStack Query (DB Cache)     │  │
-│  │   • Zod (Validation Schemas)     • Keyboard Hotkey Router        │  │
-│  └───────────────────────────────────┬──────────────────────────────┘  │
-└──────────────────────────────────────┼─────────────────────────────────┘
-                                       │ Strongly-Typed IPC (Tauri Invoke)
-┌──────────────────────────────────────▼─────────────────────────────────┐
-│                    TAURI 2.0 NATIVE CORE (Rust)                        │
-│                                                                        │
-│  ┌─────────────────────────┐  ┌──────────────────┐  ┌───────────────┐  │
-│  │ Native Command Handlers │  │ Hardware Printer │  │ Auto-Backup   │  │
-│  │ (Validation & Routing)  │  │ Driver (ESC/POS) │  │ Worker Service│  │
-│  └────────────┬────────────┘  └────────┬─────────┘  └───────┬───────┘  │
-│               │                        │                    │          │
-│  ┌────────────▼────────────────────────▼────────────────────▼───────┐  │
-│  │                   Database Connection Manager                    │  │
-│  │         • SQLite Connection Pool (WAL Mode Enabled)              │  │
-│  │         • Migration Engine & Transaction Controller              │  │
-│  └─────────────────────────────────────┬────────────────────────────┘  │
-└────────────────────────────────────────┼───────────────────────────────┘
-                                         │ Direct File I/O
-                                         ▼
-                        ┌─────────────────────────────────┐
-                        │      LOCAL PERSISTENCE LAYER    │
-                        │    %LOCALAPPDATA%/SmartMarket/  │
-                        │    └── smart_market.sqlite      │
-                        │    └── backups/ (Daily copies)  │
-                        └─────────────────────────────────┘
-```
+### Core Architectural Decisions & Clarifications
+1. **Single Unified Dashboard (No "Double Sides"):** 
+   The application is designed entirely around a **single authoritative desk** operated by the wholesale owner or counter clerk. There is **no Order Booker Portal**, no separate booker app, and no customer portal.
+2. **Manual Field Order Intake (WhatsApp / In-Person):**
+   Field order bookers operate offline in the market with notepads or messaging apps. They convey customer orders to the wholesale counter either:
+   - by sending details via **WhatsApp** (text lists, voice notes, photos of physical order slips), or
+   - by **physically visiting** the wholesale desk.
+   The counter operator manually records these orders into the central system with full attribution to the shop and booker.
+3. **Atomic Financial & Stock Integrity:**
+   Generating an invoice atomically reduces warehouse stock, locks in historical landed cost, updates customer Khata, and writes to an append-only audit ledger in a single SQLite transaction.
+4. **Append-Only Anti-Corruption Ledger:**
+   Every physical stock movement is immutably logged with timestamp, user ID, delta, and balance after.
+5. **Zero Cloud / Strictly Offline-Capable:**
+   100% operational during telecom or internet outages.
 
 ---
 
-## 3. Frontend Architecture
+## 2. System Topology & Information Flow
 
-### 3.1 Technology Stack
+```
+   ┌────────────────────────────────────────────────────────┐
+   │                  FIELD SALES AGENTS                    │
+   │  • Order Bookers visit retail shops                    │
+   │  • Take orders on physical paper slips                 │
+   │  • Send details via WhatsApp / In-Person visits        │
+   └───────────────────────────┬────────────────────────────┘
+                               │
+            WhatsApp Messages / Voice Notes / Paper Slips
+                               │
+                               ▼
+   ┌────────────────────────────────────────────────────────┐
+   │             WHOLESALE COUNTER / OFFICE DESK            │
+   │        (Single Unified Smart Market OS Console)        │
+   │                                                        │
+   │   ┌────────────────────────────────────────────────┐   │
+   │   │             Owner / Operator Actions           │   │
+   │   │  1. Manual Order Intake (WhatsApp / In-Person) │   │
+   │   │  2. Issue Warehouse Dispatch Gate Passes (F3)  │   │
+   │   │  3. High-Speed Counter POS Billing (F1)        │   │
+   │   │  4. Customer Khata Balance Recovery (F6)       │   │
+   │   │  5. End-of-Day Booker Cash Reconciliation (F5) │   │
+   │   │  6. Inward Container Stock Receiving (F4)      │   │
+   │   │  7. Executive Landed-Cost Profit Reports (F7)  │   │
+   │   │  8. Physical Stock Audit Verification (F8)     │   │
+   │   └────────────────────────────────────────────────┘   │
+   └───────────────────────────┬────────────────────────────┘
+                               │ Direct IPC / Localhost API
+                               ▼
+   ┌────────────────────────────────────────────────────────┐
+   │              LOCAL PERSISTENCE & DATA LAYER            │
+   │  • SQLite 3 Engine in Write-Ahead Logging (WAL) Mode   │
+   │  • PRAGMA foreign_keys = ON                            │
+   │  • Automated Daily Database Snapshot Backups           │
+   │  • Fully offline, local directory storage              │
+   └────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 3. Technology Stack
+
+### Presentation Layer (Frontend)
 - **Framework:** React 19 with TypeScript in strict mode.
-- **Build Tool:** Vite (ESBuild-powered hot module replacement and tree-shaking).
-- **Styling Engine:** Tailwind CSS with CSS Variables for theme consistency.
-- **UI Components:** `shadcn/ui` (accessible, headless Radix UI primitives with zero runtime style overhead).
-- **Tabular Data Grid:** `TanStack Table v8` (virtualized rendering for thousands of product SKUs and invoice lines).
-- **Data Fetching & Cache:** `TanStack Query (React Query v5)` for asynchronous SQLite reads, optimistic UI updates, and cache invalidation.
-- **Client State:** `Zustand` for lightweight, non-persisted application states (active counter invoice cart, current user shift, active filters).
-- **Form Handling:** `React Hook Form` paired with `Zod` schemas for client-side input validation.
-- **Keyboard Navigation:** `react-hotkeys-hook` for global and contextual hotkeys (`F1` for New Bill, `F2` for Product Search, `Enter` for cell traversal).
-- **Data Visualization:** `Recharts` for high-performance SVG rendering of daily, 3-day, weekly, and monthly trends.
+- **Build Tool:** Vite 6 with instant local dev server and optimized Rollup production bundler.
+- **Design System:** Tailwind CSS with high-contrast executive tokens and Google Fonts (`Plus Jakarta Sans` & `JetBrains Mono`).
+- **Data Tables:** TanStack Table v8 with standardized server-side pagination, zebra striping, and empty states.
+- **Data Caching:** TanStack Query (React Query v5) for automatic cache invalidation and background refetching.
+- **State Management:** Zustand for lightweight POS shopping cart, session auth, and UI states.
+- **Keyboard Ergonomics:** Global hotkey router mapped to physical `F1`–`F8` function keys and `<kbd>` keycaps.
+- **Hardware Barcode Listener:** Global non-blocking keyboard listener capturing hardware USB/Bluetooth barcode scanners.
 
-### 3.2 Component Layering
-```
-src/
-├── app/                  # Application routing & layout shell
-├── components/
-│   ├── ui/               # Generic base UI (Button, Input, Dialog, etc.)
-│   ├── shared/           # Common domain components (ProductCombobox, ShopSelector)
-│   └── modules/          # Feature-specific components
-│       ├── billing/      # Billing POS terminal, invoice table, summary card
-│       ├── orders/       # Order intake form, dispatch slip viewer
-│       ├── bookers/      # Booker status matrix, reconciliation modal
-│       ├── inventory/    # Stock import table, manual adjustment dialog
-│       ├── reports/      # Profit analytics, temporal filters (1d, 3d, 7d, 30d)
-│       └── audit/        # Immutable stock ledger log viewer
-├── hooks/                # Custom React hooks (useHotkeys, useBarcodeScanner)
-├── stores/               # Zustand state stores (useCartStore, useAuthStore)
-├── lib/
-│   ├── api/              # Tauri IPC bridge wrappers
-│   ├── db/               # Client-side SQL execution wrappers
-│   └── utils/            # Currency formatters, date helpers, math helpers
-└── types/                # Shared TypeScript models and IPC contracts
-```
+### Service & Backend Layer
+- **Runtime:** Node.js LTS with Express.js REST API.
+- **Language:** TypeScript with ES Modules.
+- **Authentication:** Passport.js Local Strategy with secure session cookies and `cookie-parser`.
+- **CORS:** Configured for local desktop communication (`http://localhost:5173`).
+- **Database Driver:** `better-sqlite3` native bindings for synchronous, zero-overhead SQLite operations.
+- **Journal Mode:** Write-Ahead Logging (`WAL`) enabling concurrent reads while writing.
 
 ---
 
-## 4. Backend & API Architecture
+## 4. Domain Modules (Unified Console)
 
-The system utilizes an **Express.js (Node.js) API Service Layer** coupled with the **Tauri 2.0 Desktop Shell** and **SQLite Engine**, providing standard middleware security, robust session management, and cross-platform flexibility.
+All wholesale functionality is consolidated into a single unified workspace:
 
-### 4.1 Server Middleware & Security Stack
-- **`cors`:** Configures Cross-Origin Resource Sharing allowing authorized desktop origins (e.g. `tauri://localhost`, `http://localhost:5173` in development) to access the local API with credentials.
-- **`cookie-parser`:** Parses HTTP-only, secure cookies for session token management and protection against client-side script tampering.
-- **`passport.js`:** Manages user authentication via `passport-local` strategy:
-  - Validates username/password or PIN against Argon2/bcrypt hashes.
-  - Serializes/deserializes user sessions stored locally in SQLite.
-  - Enforces role-based route middleware (`ensureAuthenticated`, `requireRole('OWNER')`).
-
-```typescript
-// Express Backend Middleware Pipeline
-import express from 'express';
-import cors from 'cors';
-import cookieParser from 'cookie-parser';
-import passport from 'passport';
-import session from 'express-session';
-
-const app = express();
-
-app.use(cors({
-  origin: ['tauri://localhost', 'http://localhost:5173'],
-  credentials: true,
-}));
-app.use(cookieParser());
-app.use(express.json());
-app.use(session({
-  secret: process.env.SESSION_SECRET || 'smart-market-local-secret',
-  resave: false,
-  saveUninitialized: false,
-  cookie: { httpOnly: true, secure: false, maxAge: 24 * 60 * 60 * 1000 }
-}));
-app.use(passport.initialize());
-app.use(passport.session());
-```
-
-### 4.2 Standardized Pagination Architecture
-To maintain sub-50ms UI performance across thousands of products, orders, bills, and audit records, all listing endpoints implement server-side pagination:
-
-- **Query Parameters:** `page` (default `1`), `limit` (default `25`, max `100`), `search`, `sortBy`, `sortOrder`.
-- **SQL Implementation:** Efficient `LIMIT :limit OFFSET :offset` queries coupled with indexed `COUNT(*)` over total matching records.
-- **Paginated Response Envelope:**
-```typescript
-interface PaginatedResponse<T> {
-  success: boolean;
-  data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    totalRecords: number;
-    totalPages: number;
-    hasNextPage: boolean;
-    hasPrevPage: boolean;
-  };
-}
-```
+| Key | Module | Purpose |
+| :--- | :--- | :--- |
+| **`[F1]`** | **Billing POS Terminal** | High-speed retail counter billing, barcode scanning, item discounts, cash/credit settlement. |
+| **`[F2]`** | **Pre-Booking Orders** | Manual order intake from WhatsApp and in-person booker visits; 1-click conversion to bills. |
+| **`[F3]`** | **Warehouse Dispatch Slips** | Custody transfer gate-passes for goods released to bookers; returned goods restock. |
+| **`[F4]`** | **Inventory Catalog & Imports**| Central product catalog, stock levels, inward container shipments, landed purchase costs. |
+| **`[F5]`** | **Order Bookers & Field Sales**| Booker profiles, assigned routes/beats, commission percentages, and daily cash reconciliation. |
+| **`[F6]`** | **Retail Customers & Khata** | Customer shop directory, credit limits, outstanding Khata balances, and payment receipts. |
+| **`[F7]`** | **Executive Profit & Analytics**| Landed COGS profitability, daily revenue, sales vs. cash collection trend charts. |
+| **`[F8]`** | **Immutable Audit Ledger** | Append-only physical stock transaction log with database integrity discrepancy check. |
 
 ---
 
-## 5. Database Architecture
+## 5. Security & Multi-Role Governance
 
-### 5.1 SQLite Configuration & Tuning
-To achieve enterprise-grade reliability and concurrency on local hardware:
-- **Journal Mode (`WAL`):** Write-Ahead Logging allows concurrent readers while a write transaction is in progress, preventing UI freezes during heavy billing.
-- **Synchronous Mode (`NORMAL`):** Provides complete crash-safety with significantly higher write throughput.
-- **Foreign Keys:** Strictly enforced at all times (`PRAGMA foreign_keys = ON;`).
-- **Busy Timeout (`5000ms`):** Prevents database locked errors by queuing concurrent write attempts.
-
-```sql
--- Initial PRAGMA Execution on Connection
-PRAGMA journal_mode = WAL;
-PRAGMA synchronous = NORMAL;
-PRAGMA foreign_keys = ON;
-PRAGMA busy_timeout = 5000;
-PRAGMA temp_store = MEMORY;
-```
-
-### 5.2 Transactional Guarantees
-All operations affecting multiple tables—specifically **Bill Creation + Stock Deduction + Ledger Entry**—are wrapped in an atomic transaction:
-
-```
-BEGIN TRANSACTION;
-  1. Insert into bills
-  2. Insert into bill_items
-  3. Update products (Decrement physical stock)
-  4. Insert into inventory_ledger (Audit entry for each line item)
-  5. Update shop balance (If credit invoice)
-COMMIT;
-```
-If any step fails (e.g. stock constraint violation), the entire operation rolls back automatically, leaving the database 100% consistent.
-
----
-
-## 6. Detailed Data Flow Architecture
-
-### 6.1 Order → Dispatch Slip → Shop Bill → Stock Deduction → Profit Flow
-
-```
-[ Customer / Retail Shop ]
-           │
-           ▼
-[ 1. Order Registration ] ────► Inserts into `orders` & `order_items` (Status: PENDING)
-           │
-           ▼
-[ 2. Dispatch Slip Gen ]  ────► Inserts into `dispatch_slips` (Assigned to Order Booker)
-                                (Status: DISPATCHED)
-           │
-           ▼
-[ 3. Retail Delivery ]    ────► Bill Confirmation at Counter / Field Return
-           │
-           ▼
-[ 4. ATOMIC BILLING TX ]  ────► BEGIN TRANSACTION;
-                                ├── Insert `bills` & `bill_items`
-                                ├── Decrement `products.current_stock`
-                                ├── Insert `inventory_ledger` (Type: SALE_BILL)
-                                ├── Update `order_bookers` collection liability
-                                └── COMMIT;
-           │
-           ▼
-[ 5. Automated Analytics ] ───► Calculates:
-                                ├── Daily Gross Profit = Sum((Selling Price - Cost Price) * Qty)
-                                ├── Booker Matrix = Delivered vs. Pending vs. Cash Collected
-                                └── Executive Dashboard (1d, 3d, 7d, 30d views)
-```
-
----
-
-## 7. Authentication & Authorization Architecture
-
-The system operates as a private internal tool with two distinct local system roles:
-
-```
-                    ┌────────────────────────────┐
-                    │      Local Login Gate      │
-                    │   (PIN / Password Auth)    │
-                    └──────────────┬─────────────┘
-                                   │
-                   ┌───────────────┴───────────────┐
-                   ▼                               ▼
-      ┌─────────────────────────┐     ┌─────────────────────────┐
-      │       Role: OWNER       │     │     Role: OPERATOR      │
-      ├─────────────────────────┤     ├─────────────────────────┤
-      │ • Full Module Access    │     │ • Order Entry & Booking │
-      │ • View Purchase Costs   │     │ • Slip & Bill Printing  │
-      │ • View Net Profit & ROI │     │ • Customer / Shop View  │
-      │ • Stock Adjustments     │     │ ✕ Hidden Purchase Costs │
-      │ • Backup / Restore      │     │ ✕ Hidden Profit Reports │
-      │ • Booker Reconciliation │     │ ✕ Cannot Delete Records │
-      └─────────────────────────┘     └─────────────────────────┘
-```
-
----
-
-## 8. Error-Handling & Resilience Strategy
-
-1. **Frontend Boundary:** React Error Boundaries intercept rendering failures and display actionable recovery actions without terminating the application.
-2. **IPC Error Serialization:** Rust `Result<T, AppError>` types are mapped into structured error objects containing domain-specific error codes (`INSUFFICIENT_STOCK`, `DUPLICATE_SKU`, `BOOKER_NOT_FOUND`).
-3. **Database Guardrails:** SQLite `CHECK` constraints prevent negative stock balances or invalid order statuses at the lowest database layer.
-4. **Crash Resilience:** The SQLite WAL file guarantees zero database corruption in the event of an abrupt power failure or system crash.
-
----
-
-## 9. Anti-Corruption & Audit Architecture
-
-To directly satisfy the owner's requirement for anti-corruption and stock shrinkage protection:
-- **Append-Only Inventory Ledger:** The `inventory_ledger` table permits only `INSERT` operations. `UPDATE` and `DELETE` operations on this table are strictly prohibited.
-- **Stock Reconciliation Formula:**
-  $$\text{Warehouse Physical Count} \equiv \sum \text{Ledger Inward Transactions} - \sum \text{Ledger Outward Transactions}$$
-- **Traceability References:** Every ledger transaction requires a foreign reference type (`IMPORT`, `BILL`, `DISPATCH_SLIP`, `RETURN`, `DAMAGE`) and the ID of the operator who executed it.
-
----
-
-## 10. File & Folder Responsibilities
-
-```
-Smart Market OS/
-├── src/                          # Frontend React Source
-│   ├── app/                      # Main Window shell & routing
-│   ├── components/               # UI components categorized by module
-│   │   ├── billing/              # High-speed POS billing components
-│   │   ├── slips/                # Dispatch slip generation & preview
-│   │   ├── inventory/            # Import receiving & stock tables
-│   │   ├── bookers/              # Booker tracking & reconciliation
-│   │   └── reports/              # Daily/weekly/monthly profit charts
-│   ├── hooks/                    # Custom keyboard and query hooks
-│   ├── lib/                      # Core helpers, math, formatting
-│   ├── stores/                   # Global Zustand state stores
-│   └── types/                    # Shared TypeScript interfaces
-├── src-tauri/                    # Native Rust Core
-│   ├── src/
-│   │   ├── main.rs               # Tauri entry point & setup
-│   │   ├── commands/             # Invokable IPC commands
-│   │   │   ├── billing.rs        # Transactional bill execution
-│   │   │   ├── inventory.rs      # Stock queries & adjustments
-│   │   │   ├── bookers.rs        # Booker performance queries
-│   │   │   └── reports.rs        # Aggregated profit calculations
-│   │   ├── db/
-│   │   │   ├── mod.rs            # Database connection pool
-│   │   │   └── migrations/       # SQL schema migration scripts
-│   │   ├── printer/              # Direct ESC/POS printing routines
-│   │   └── backup/               # Background database backup service
-│   ├── Cargo.toml                # Rust dependencies
-│   └── tauri.conf.json           # Tauri window & bundle configuration
-├── documentation/                # Project architecture & specifications
-└── package.json                  # Frontend dependencies & scripts
-```
+Even though the system is operated from a single central desk:
+1. **Owner Role (`OWNER`):**
+   - Full access to all modules including True Landed Cost Margins (`F7`), Audit Logs (`F8`), and System Settings.
+   - Ability to manage authorized operator accounts and create database backups.
+2. **Operator Role (`OPERATOR`):**
+   - Access restricted to counter billing (`F1`), order entry (`F2`), dispatch slips (`F3`), and customer Khata entries (`F6`).
+   - Landed purchase costs, true profit margins, and audit adjustments are hidden.
+3. **No Booker Role:**
+   - Order bookers are **not** system users and cannot log in.

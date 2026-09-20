@@ -27,7 +27,7 @@ export interface PaginatedResponse<T> {
 export interface CreateBillPayload {
   order_id?: number;
   shop_id: number;
-  order_booker_id: number;
+  order_booker_id?: number;
   items: Array<{
     product_id: number;
     quantity: number;

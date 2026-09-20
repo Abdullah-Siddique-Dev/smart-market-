@@ -1,4 +1,4 @@
-import { UserRole, OrderStatus, PaymentStatus, InventoryTransactionType } from './enums';
+import { UserRole, OrderStatus, PaymentStatus, InventoryTransactionType, OrderSource } from './enums';
 
 export interface User {
   id: number;
@@ -74,8 +74,9 @@ export interface Order {
   order_number: string;
   shop_id: number;
   shop_name: string;
-  order_booker_id: number;
-  booker_name: string;
+  order_booker_id?: number | null;
+  booker_name?: string | null;
+  order_source?: OrderSource;
   order_date: string;
   status: OrderStatus;
   total_amount: number;
@@ -129,8 +130,8 @@ export interface Bill {
   shop_name: string;
   shop_phone: string | null;
   shop_address: string | null;
-  order_booker_id: number;
-  booker_name: string;
+  order_booker_id?: number | null;
+  booker_name?: string | null;
   bill_date: string;
   subtotal: number;
   discount_amount: number;

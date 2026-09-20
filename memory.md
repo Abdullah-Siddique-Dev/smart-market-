@@ -4,12 +4,13 @@
 
 - **Project Name:** Smart Market OS
 - **System Nature:** Private, on-premises, offline-first Enterprise Management Desktop Application for an **Import & Wholesale Distribution Business**.
-- **Primary Platform:** Windows Desktop (`.exe`), built with **Tauri 2.0 + React 19 (TypeScript) + Embedded SQLite**.
+- **Primary Platform:** Windows Desktop (`.exe`), built with **React 19 (TypeScript) + Express.js + Embedded SQLite (WAL mode)**.
 - **Primary Business Objectives:**
   1. Eliminate owner confusion over stock sold vs. stock remaining.
-  2. Stop verbal/mental profit estimations by automating exact daily, 3-day, weekly, and monthly net profit calculations.
+  2. Stop verbal/mental profit estimations by automating exact daily, 3-day, weekly, and monthly net profit calculations based on landed COGS.
   3. Prevent theft and corruption between warehouse stock, field order bookers, and customer cash.
   4. Provide high-speed counter billing that generates individual shop bills and atomically reduces warehouse inventory.
+  5. Provide a **single unified management console** for the wholesale owner/operator to manage orders, billing, inventory, booker reconciliation, and customer Khata without needing multiple apps or field logins.
 
 ---
 
@@ -17,9 +18,11 @@
 
 | Term | Definition & Business Meaning |
 | :--- | :--- |
+| **Unified Single Dashboard** | A single all-inclusive management console for the wholesale owner/operator. There are **no** double sides, no separate booker portal, and no external customer portal. |
 | **Landed / Purchase Cost** | The exact cost of importing/acquiring a product unit. Used as the baseline to compute true gross profit: `Selling Price - Purchase Cost`. |
-| **Order Booker** | A field sales and delivery representative who visits retail shops, books orders, takes physical stock from the warehouse, delivers goods, and collects payments. |
-| **Dispatch Slip** | A formal warehouse gate-pass and custody transfer document listing the exact quantities of goods handed over to an Order Booker. |
+| **Order Booker** | A field sales agent who visits retail shops. **Has no software login**. Transmits orders via WhatsApp or physical visits; tracked in the system by the operator for commission, dispatch, and reconciliation. |
+| **Manual WhatsApp Order Intake** | The process where the counter operator takes order details received via WhatsApp (text, voice note, photo) and keys them into the system. |
+| **Dispatch Slip (Gate Pass)** | A formal warehouse gate-pass and custody transfer document listing the exact quantities of goods handed over to an Order Booker for delivery. |
 | **Shop Bill / Invoice** | The commercial itemized bill issued to a specific retail customer shop. Generating this bill triggers the atomic reduction of warehouse stock. |
 | **Shop Khata (Ledger)** | The running credit account of a retail shop. Tracks unpaid balances, previous debt, and partial payments. |
 | **Atomic Stock Reduction** | Database-level guarantee where issuing an invoice and deducting physical inventory happen simultaneously in one transaction. |
@@ -31,11 +34,11 @@
 ## 3. Core Architectural Decisions (ADRs)
 
 ### ADR-01: Desktop Native over Web/Cloud Application
-- **Decision:** Build as an offline-first Windows desktop app using **Tauri 2.0**.
-- **Rationale:** The business requires zero recurring hosting costs, zero VPS maintenance, 100% offline capability during internet/telecom outages, and direct low-latency access to local thermal printers.
+- **Decision:** Build as an offline-first Windows desktop application.
+- **Rationale:** The business requires zero recurring hosting costs, zero VPS maintenance, 100% offline capability during internet/telecom outages, and direct low-latency access.
 
 ### ADR-02: Embedded SQLite over Client-Server RDBMS
-- **Decision:** Use an embedded **SQLite 3** engine with Write-Ahead Logging (`WAL`) mode via `tauri-plugin-sql` and Rust backend.
+- **Decision:** Use an embedded **SQLite 3** engine with Write-Ahead Logging (`WAL`) mode and foreign keys enabled.
 - **Rationale:** Eliminates the need for a separate database server installation (PostgreSQL/MySQL), requires zero database administration, runs fully self-contained inside the application directory, and provides instant portability and backup by copying a single `.sqlite` file.
 
 ### ADR-03: Historical Cost Snapshotting in Bill Items
@@ -47,55 +50,49 @@
 - **Rationale:** Direct fulfillment of the owner's requirement for anti-corruption features. Physical stock in the warehouse must always be mathematically reconcilable against the cumulative sum of ledger transactions.
 
 ### ADR-05: Keyboard-First POS UI
-- **Decision:** High-volume billing workflows are bound to keyboard shortcuts (`F1`–`F10`, `Enter`, `Tab`, `Esc`).
+- **Decision:** High-volume billing workflows are bound to keyboard shortcuts (`F1`–`F8`, `Enter`, `Tab`, `Esc`).
 - **Rationale:** Wholesale billing clerks need to process long lists of items in seconds without reaching for a mouse.
 
 ### ADR-06: Physical Hardware Printing Temporarily Excluded
 - **Decision:** Direct ESC/POS thermal printing and physical printer driver integrations are deferred and temporarily excluded from the current scope.
-- **Rationale:** Streamlines core business validation (order booking, atomic inventory reduction, booker reconciliation, and profit calculations). Slips and bills will be generated, saved, and previewed digitally on-screen within the application.
+- **Rationale:** Streamlines core business validation (order booking, atomic inventory reduction, booker reconciliation, and profit calculations). Slips and bills are generated, saved, and previewed digitally on-screen within the application.
 
 ### ADR-07: Express.js Backend with Passport.js, Cookie-Parser & CORS
-- **Decision:** Implement a local Node.js / Express backend service layer connecting to the SQLite database, using `cors`, `cookie-parser`, and `passport.js` (Local Strategy with session cookies) for authentication and role management, with Tauri 2.0 hosting the desktop frontend shell.
-- **Rationale:** Enables full TypeScript/JavaScript across the entire stack, leverages mature authentication middleware (`passport.js` + `cookie-parser`), and safely handles desktop-to-API communication with `cors`.
+- **Decision:** Implement a local Node.js / Express backend service layer connecting to the SQLite database, using `cors`, `cookie-parser`, and `passport.js` (Local Strategy with session cookies) for authentication.
+- **Rationale:** Enables full TypeScript/JavaScript across the entire stack, leverages mature authentication middleware, and safely handles client-to-API communication.
 
 ### ADR-08: Standardized Server-Side Pagination
-- **Decision:** Implement standardized server-side pagination (`page`, `limit` / `pageSize`, `totalCount`, `totalPages`) across all list endpoints (`products`, `orders`, `bills`, `retail_shops`, `inventory_ledger`).
-- **Rationale:** Wholesale businesses accumulate tens of thousands of records. Server-side pagination prevents memory bloat in the desktop webview, reduces SQLite I/O, and ensures smooth 60fps rendering in TanStack Table.
+- **Decision:** Implement standardized server-side pagination (`page`, `limit`, `totalRecords`, `totalPages`) across all list endpoints (`products`, `orders`, `bills`, `retail_shops`, `inventory_ledger`).
+- **Rationale:** Wholesale businesses accumulate tens of thousands of records. Server-side pagination prevents memory bloat in the desktop webview, reduces SQLite I/O, and ensures smooth 60fps rendering.
+
+### ADR-09: Single Unified Owner Console & Manual Order Intake (WhatsApp / In-Person)
+- **Decision:** Consolidate all ERP capabilities into a **single, unified Owner/Operator dashboard**. Eliminate any double-sided portal architecture (NO Order Booker portal or customer-facing apps).
+- **Rationale:** Per business specification, field order bookers communicate order details verbally in-person or via WhatsApp messages/photos. The counter operator manually keys these orders into the central system. Order bookers are represented only as attribution and reconciliation entities within the database, without login credentials.
 
 ---
 
 ## 4. Current Implementation Status
 
-- **Current State:** **Backend REST API Fully Implemented & Tested.**
-- **Completed Deliverables:**
-  - `prd.md`, `architecture.md`, `datamodels.md`, `design.md`, `phases.md`, `rules.md`
-  - `server/` (Complete Express.js REST API Backend in TypeScript)
-    - 10 Domain Modules (Auth, Products, Imports, Orders, Slips, Bills, Shops, Bookers, Reports, Audit, System)
-    - Passport.js Local Strategy with session cookies & CORS
-    - SQLite database with WAL mode, foreign keys, and DDL schema
-    - Atomic billing transaction (bill + stock deduction + immutable ledger)
-    - 11-suite automated smoke test (`npm run test:smoke` passing 100%)
-- **Completed Code Phases:**
-  - Phase 1 (Backend API Foundation)
-  - Phase 2 (Embedded Database & Schema Migration Engine)
-  - Phase 3 (Authentication with Passport.js, Cookies & RBAC)
-  - Core Domain Endpoints for Phases 4-13 implemented at API layer.
-- **Next Immediate Action:** Begin frontend client integration (Tauri desktop shell + React 19 UI).
+- **Architecture:** Single unified desktop dashboard for wholesale owner/operator.
+- **Backend:** Express.js + SQLite in WAL mode with Passport.js session auth.
+- **Frontend:** React 19 + Tailwind CSS + TanStack Query with full F1-F8 keyboard navigation.
+- **Domain Modules:**
+  1. Billing POS Terminal (`F1`)
+  2. Pre-Booking Orders (`F2`) — Supports manual WhatsApp / in-person order registration
+  3. Warehouse Dispatch Slips (`F3`) — Booker gate-passes & reconciliation
+  4. Inventory & Stock Receiving (`F4`) — Catalog & inward imports
+  5. Order Bookers & Field Sales (`F5`) — Booker commissions & route assignments
+  6. Retail Customers & Khata (`F6`) — Customer directory & ledger
+  7. Profit & Sales Analytics (`F7`) — Landed COGS profitability reports
+  8. Immutable Audit Ledger (`F8`) — Cryptographic physical stock audit trail
+  9. System Settings — Database backup snapshot triggers & security
 
 ---
 
-## 5. Known Hardware & Operational Constraints
+## 5. Known Operational Rules
 
-1. **Operating Environment:** Windows 10 / Windows 11 (64-bit).
-2. **Connectivity:** Strictly offline-capable. No requirement for active internet access.
-3. **Printing Status:** **Temporarily Excluded / Deferred.** Slips and bills are rendered and previewed digitally on-screen (no physical printer driver required).
-4. **Display Targets:** Optimized for standard office monitor resolutions (1366x768 to 1920x1080).
-
----
-
-## 6. Critical Lessons for Future AI Agents
-
-1. **NEVER silently invent CRM or ERP modules:** Stick strictly to what is defined in `prd.md`. Do not add foreign exchange modules, public customer portals, or subscription billing.
-2. **NEVER update inventory with raw unrecorded SQL:** Any stock change must ALWAYS insert a corresponding record into `inventory_ledger`.
-3. **NEVER use JavaScript floating-point math for money:** Store monetary amounts as fixed-precision decimals or clean rounded numbers to prevent rounding drift in profit reports.
-4. **ALWAYS check the Source of Truth Hierarchy before making architectural deviations:** The Project Owner's original business requirements (`Management system.png`) and `prd.md` override assumptions.
+1. **Single Operator Desk:** All data entry is centralized at the counter.
+2. **Bookers Have No App Access:** Never create external login screens or mobile clients for bookers.
+3. **Connectivity:** Strictly offline-capable. No requirement for active internet access.
+4. **Printing Status:** **Temporarily Excluded / Deferred.** Digital on-screen slips only.
+5. **Anti-Corruption Rule:** Every physical stock change must ALWAYS create an `inventory_ledger` row.

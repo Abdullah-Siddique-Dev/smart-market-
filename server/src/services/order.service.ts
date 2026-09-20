@@ -15,8 +15,9 @@ export interface OrderHeader {
   order_number: string;
   shop_id: number;
   shop_name: string;
-  order_booker_id: number;
-  booker_name: string;
+  order_booker_id?: number | null;
+  booker_name?: string | null;
+  order_source?: string;
   order_date: string;
   status: OrderStatus;
   total_amount: number;
@@ -76,10 +77,10 @@ export class OrderService {
     }
 
     const dataSql = `
-      SELECT o.*, s.shop_name, b.name as booker_name, u.full_name as creator_name
+      SELECT o.*, s.shop_name, COALESCE(b.name, 'Direct Counter') as booker_name, u.full_name as creator_name
       FROM orders o
       JOIN retail_shops s ON o.shop_id = s.id
-      JOIN order_bookers b ON o.order_booker_id = b.id
+      LEFT JOIN order_bookers b ON o.order_booker_id = b.id
       JOIN system_users u ON o.created_by = u.id
       ${whereClause}
       ORDER BY o.id DESC
@@ -89,7 +90,7 @@ export class OrderService {
       SELECT COUNT(*) as count
       FROM orders o
       JOIN retail_shops s ON o.shop_id = s.id
-      JOIN order_bookers b ON o.order_booker_id = b.id
+      LEFT JOIN order_bookers b ON o.order_booker_id = b.id
       ${whereClause}
     `;
 
@@ -105,10 +106,10 @@ export class OrderService {
   static getOrderById(id: number): OrderHeader {
     const order = db
       .prepare(`
-        SELECT o.*, s.shop_name, b.name as booker_name, u.full_name as creator_name
+        SELECT o.*, s.shop_name, COALESCE(b.name, 'Direct Counter') as booker_name, u.full_name as creator_name
         FROM orders o
         JOIN retail_shops s ON o.shop_id = s.id
-        JOIN order_bookers b ON o.order_booker_id = b.id
+        LEFT JOIN order_bookers b ON o.order_booker_id = b.id
         JOIN system_users u ON o.created_by = u.id
         WHERE o.id = ?
       `)
@@ -133,7 +134,8 @@ export class OrderService {
 
   static createOrder(data: {
     shop_id: number;
-    order_booker_id: number;
+    order_booker_id?: number | null;
+    order_source?: string;
     order_date?: string;
     notes?: string;
     items: OrderItemInput[];
@@ -143,15 +145,19 @@ export class OrderService {
       throw new AppError('An order must contain at least one line item', 400, 'EMPTY_ORDER');
     }
 
-    // Verify shop and booker
+    // Verify shop
     const shop = db.prepare('SELECT id FROM retail_shops WHERE id = ?').get(data.shop_id);
     if (!shop) throw new AppError('Retail shop not found', 404, 'SHOP_NOT_FOUND');
 
-    const booker = db.prepare('SELECT id FROM order_bookers WHERE id = ?').get(data.order_booker_id);
-    if (!booker) throw new AppError('Order booker not found', 404, 'BOOKER_NOT_FOUND');
+    let bookerId = data.order_booker_id || null;
+    if (bookerId) {
+      const booker = db.prepare('SELECT id FROM order_bookers WHERE id = ?').get(bookerId);
+      if (!booker) throw new AppError('Order booker not found', 404, 'BOOKER_NOT_FOUND');
+    }
 
     const orderNumber = `ORD-${Date.now().toString().slice(-6)}`;
     const orderDate = data.order_date || new Date().toISOString().slice(0, 10);
+    const orderSource = data.order_source || 'MANUAL_WHATSAPP';
 
     const executeCreate = db.transaction(() => {
       let totalAmount = 0;
@@ -163,13 +169,14 @@ export class OrderService {
 
       const orderResult = db
         .prepare(`
-          INSERT INTO orders (order_number, shop_id, order_booker_id, order_date, status, total_amount, notes, created_by)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+          INSERT INTO orders (order_number, shop_id, order_booker_id, order_source, order_date, status, total_amount, notes, created_by)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         `)
         .run(
           orderNumber,
           data.shop_id,
-          data.order_booker_id,
+          bookerId,
+          orderSource,
           orderDate,
           ORDER_STATUSES.PENDING,
           totalAmount,

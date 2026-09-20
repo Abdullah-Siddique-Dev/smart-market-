@@ -73,12 +73,13 @@ CREATE TABLE IF NOT EXISTS order_bookers (
   created_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
 );
 
--- 6. Orders Header
+-- 6. Orders Header (Supports manual entry from WhatsApp, in-person, phone)
 CREATE TABLE IF NOT EXISTS orders (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   order_number TEXT NOT NULL UNIQUE,
   shop_id INTEGER NOT NULL REFERENCES retail_shops(id),
-  order_booker_id INTEGER NOT NULL REFERENCES order_bookers(id),
+  order_booker_id INTEGER REFERENCES order_bookers(id),
+  order_source TEXT NOT NULL DEFAULT 'MANUAL_WHATSAPP' CHECK (order_source IN ('MANUAL_WHATSAPP', 'MANUAL_IN_PERSON', 'DIRECT_PHONE', 'DIRECT_WALKIN')),
   order_date TEXT NOT NULL DEFAULT (date('now', 'localtime')),
   status TEXT NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'DISPATCHED', 'BILLED', 'CANCELLED')),
   total_amount REAL NOT NULL DEFAULT 0.0 CHECK (total_amount >= 0),
@@ -91,6 +92,7 @@ CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 CREATE INDEX IF NOT EXISTS idx_orders_booker ON orders(order_booker_id);
 CREATE INDEX IF NOT EXISTS idx_orders_shop ON orders(shop_id);
 CREATE INDEX IF NOT EXISTS idx_orders_date ON orders(order_date);
+CREATE INDEX IF NOT EXISTS idx_orders_source ON orders(order_source);
 
 -- 7. Order Items
 CREATE TABLE IF NOT EXISTS order_items (
@@ -137,7 +139,7 @@ CREATE TABLE IF NOT EXISTS bills (
   bill_number TEXT NOT NULL UNIQUE,
   order_id INTEGER REFERENCES orders(id),
   shop_id INTEGER NOT NULL REFERENCES retail_shops(id),
-  order_booker_id INTEGER NOT NULL REFERENCES order_bookers(id),
+  order_booker_id INTEGER REFERENCES order_bookers(id),
   bill_date TEXT NOT NULL DEFAULT (datetime('now', 'localtime')),
   subtotal REAL NOT NULL CHECK (subtotal >= 0),
   discount_amount REAL NOT NULL DEFAULT 0.0 CHECK (discount_amount >= 0),

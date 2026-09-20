@@ -23,7 +23,8 @@ export const ordersApi = {
 
   createOrder: async (data: {
     shop_id: number;
-    order_booker_id: number;
+    order_booker_id?: number;
+    order_source?: string;
     order_date?: string;
     notes?: string;
     items: Array<{ product_id: number; quantity: number; unit_price: number }>;

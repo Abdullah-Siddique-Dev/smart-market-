@@ -32,3 +32,12 @@ export const INVENTORY_TRANSACTION_TYPES = {
 
 export type InventoryTransactionType =
   (typeof INVENTORY_TRANSACTION_TYPES)[keyof typeof INVENTORY_TRANSACTION_TYPES];
+
+export const ORDER_SOURCES = {
+  MANUAL_WHATSAPP: 'MANUAL_WHATSAPP',
+  MANUAL_IN_PERSON: 'MANUAL_IN_PERSON',
+  DIRECT_PHONE: 'DIRECT_PHONE',
+  DIRECT_WALKIN: 'DIRECT_WALKIN',
+} as const;
+
+export type OrderSource = (typeof ORDER_SOURCES)[keyof typeof ORDER_SOURCES];
