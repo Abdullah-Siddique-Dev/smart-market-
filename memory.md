@@ -50,6 +50,10 @@
 - **Decision:** High-volume billing workflows are bound to keyboard shortcuts (`F1`–`F10`, `Enter`, `Tab`, `Esc`).
 - **Rationale:** Wholesale billing clerks need to process long lists of items in seconds without reaching for a mouse.
 
+### ADR-06: Physical Hardware Printing Temporarily Excluded
+- **Decision:** Direct ESC/POS thermal printing and physical printer driver integrations are deferred and temporarily excluded from the current scope.
+- **Rationale:** Streamlines core business validation (order booking, atomic inventory reduction, booker reconciliation, and profit calculations). Slips and bills will be generated, saved, and previewed digitally on-screen within the application.
+
 ---
 
 ## 4. Current Implementation Status
@@ -72,9 +76,7 @@
 
 1. **Operating Environment:** Windows 10 / Windows 11 (64-bit).
 2. **Connectivity:** Strictly offline-capable. No requirement for active internet access.
-3. **Printers Supported:**
-   - Standard 80mm and 58mm thermal receipt printers via direct ESC/POS or native OS print.
-   - Standard A4 / A5 office printers for wholesale invoices and slips.
+3. **Printing Status:** **Temporarily Excluded / Deferred.** Slips and bills are rendered and previewed digitally on-screen (no physical printer driver required).
 4. **Display Targets:** Optimized for standard office monitor resolutions (1366x768 to 1920x1080).
 
 ---

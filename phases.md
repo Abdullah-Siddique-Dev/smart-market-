@@ -229,33 +229,33 @@ Phase 14: Automated Local Backup, Hardening & Installer Packaging
 ## Phase 9: Dispatch Slip Generation & Physical Handover
 
 - **Goal:** Generate formal dispatch gate-passes when bookers pull physical stock from the warehouse.
-- **Scope:** Slip generation, item consolidation across assigned orders, print formatting (80mm/A4).
+- **Scope:** Slip generation, item consolidation across assigned orders, digital on-screen slip rendering (physical hardware printing excluded for now).
 - **Expected Files/Modules:**
   - `src-tauri/src/commands/slips.rs`
   - `src/components/modules/slips/DispatchSlipModal.tsx`
-  - `src/components/modules/slips/PrintableSlip.tsx`
+  - `src/components/modules/slips/DigitalSlipPreview.tsx`
 - **Dependencies:** Phase 8.
 - **Implementation Tasks:**
   1. Build Slip Generation workflow: Select Booker -> Consolidate all pending orders for that Booker -> Generate `dispatch_slips` record.
   2. Transition consolidated orders to `DISPATCHED` status.
-  3. Generate printable slip with items, quantities, date, and signature lines.
+  3. Generate digital slip preview with items, quantities, date, and authorization indicators.
   4. Log dispatch event in `inventory_ledger` as `'BOOKER_DISPATCH'`.
 - **Validation Tasks:**
   - Generating a slip updates all included orders to `DISPATCHED`.
-  - Slip print preview accurately renders on 80mm thermal and A4 paper profiles.
-- **Completion Criteria:** Warehouse can hand physical stock to a booker with an authorized, signed dispatch slip.
+  - Digital slip preview accurately renders itemized summary on-screen.
+- **Completion Criteria:** Warehouse can hand physical stock to a booker with an authorized digital dispatch slip saved in the system.
 
 ---
 
 ## Phase 10: High-Speed Billing POS & Atomic Stock Decrement Engine
 
 - **Goal:** Deliver the counter billing terminal that issues individual shop bills and atomically updates stock.
-- **Scope:** Keyboard-first POS screen, atomic transaction (Bill + Bill Items + Stock Decrement + Ledger Insert), and receipt printing.
+- **Scope:** Keyboard-first POS screen, atomic transaction (Bill + Bill Items + Stock Decrement + Ledger Insert), and on-screen digital invoice summary (physical hardware printing excluded for now).
 - **Expected Files/Modules:**
   - `src-tauri/src/commands/billing.rs`
   - `src/components/modules/billing/BillingTerminal.tsx`
   - `src/components/modules/billing/InvoiceSummaryCard.tsx`
-  - `src/components/modules/billing/PrintableInvoice.tsx`
+  - `src/components/modules/billing/DigitalInvoiceModal.tsx`
   - `src/stores/useBillingCartStore.ts`
 - **Dependencies:** Phases 4, 6, 7, 8.
 - **Implementation Tasks:**
@@ -271,12 +271,12 @@ Phase 14: Automated Local Backup, Hardening & Installer Packaging
      COMMIT;
      ```
   3. Handle conversion of a `DISPATCHED` order into a finalized `BILL`.
-  4. Integrate direct ESC/POS thermal printing and standard A4 invoice printing.
+  4. Render digital invoice view showing itemized totals, payment status, and shop balance.
 - **Validation Tasks:**
   - Generating a bill with 5 units of Product A instantly reduces `products.current_stock` by 5.
   - If a transaction attempts to sell more than available stock, transaction rolls back cleanly with an explicit error.
-  - Printed invoice displays shop name, itemized lines, net payable, and previous running balance.
-- **Completion Criteria:** Bills are created, stock is atomically decremented, and receipts print reliably.
+  - Digital invoice view displays shop name, itemized lines, net payable, and previous running balance.
+- **Completion Criteria:** Bills are created, stock is atomically decremented, and digital invoices are saved and viewable in the system.
 
 ---
 

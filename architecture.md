@@ -104,7 +104,7 @@ The native backend runs as a compiled Rust executable hosting the native window 
 ### 4.1 Core Responsibilities
 1. **Lifecycle & Window Control:** Initializing the application window, window state preservation, and graceful shutdown.
 2. **Database Engine Management:** Managing the embedded SQLite connection, executing schema migrations on launch, and enforcing SQLite pragmas.
-3. **Hardware & Thermal Printing:** Communicating directly with connected ESC/POS thermal printers via USB/Serial or triggering OS print dialogs for standard A4 bills.
+3. **Digital Slips & Invoice Generation:** Generating serialized digital dispatch gate-passes and wholesale invoices for on-screen preview (physical hardware ESC/POS printing is deferred for the time being).
 4. **Automated Backup Service:** Executing a background task upon application shutdown or daily schedule to create timestamped snapshot copies of `smart_market.sqlite`.
 5. **Secure Authentication:** Hashing credentials using Argon2/bcrypt and managing authenticated local sessions.
 

@@ -74,14 +74,14 @@ Every requirement below is directly traceable to the provided business requireme
 ### 4.2 Slip Generation & Assignment
 - **REQ-SLP-01 (Dispatch Slip Generation):** When goods are physically handed over to an order booker, the system shall generate a formal **Dispatch Slip** (Pick/Delivery Slip).
 - **REQ-SLP-02 (Booker Stock Binding):** The dispatch slip must clearly list the booker's name, timestamp, retail destination shops, itemized products, and dispatched quantities.
-- **REQ-SLP-03 (Printable Slip Format):** Dispatch slips must be printable directly to standard thermal printers (80mm/58mm) or standard office printers (A4/A5).
+- **REQ-SLP-03 (Digital Slip Generation & Preview):** Dispatch slips must be generated and rendered digitally on-screen with full itemization and authorization sections (physical hardware printing is temporarily excluded).
 - **REQ-SLP-04 (Slip Verification):** Dispatched quantities remain legally bound to the order booker until the final bill is issued or unsold stock is formally returned to the warehouse.
 
 ### 4.3 Billing & Retail Shop Invoicing
 - **REQ-BIL-01 (Separate Bills per Shop):** The system shall generate distinct, serialized, professional bills/invoices for each individual retail shop.
 - **REQ-BIL-02 (Itemized Billing):** Each bill must contain: Invoice number, Date, Shop details, Booker name, Line items (Product name, Quantity, Rate, Total), Gross Total, Discount (if any), Net Payable, and Payment Mode (Cash, Credit/Khata).
-- **REQ-BIL-03 (Fast Keyboard Entry):** The billing screen must be keyboard-first (shortcuts for search, quantity entry, and print) to enable rapid counter checkout.
-- **REQ-BIL-04 (Shop Ledger / Outstanding Balance):** Invoices on credit must update the retail shop’s running balance (Khata) and optionally display the previous unpaid balance on the printed bill.
+- **REQ-BIL-03 (Fast Keyboard Entry):** The billing screen must be keyboard-first (shortcuts for search, quantity entry, and save) to enable rapid counter checkout.
+- **REQ-BIL-04 (Shop Ledger / Outstanding Balance):** Invoices on credit must update the retail shop’s running balance (Khata) and display the previous unpaid balance on the digital invoice view.
 
 ### 4.4 Real-Time Atomic Stock Reduction
 - **REQ-STK-01 (Atomic Stock Decrement):** The system must automatically and atomically decrement warehouse stock the moment a bill is generated.
@@ -152,7 +152,7 @@ Every requirement below is directly traceable to the provided business requireme
 
 ### 5.4 Usability & Hardware Integration
 - **NFR-USE-01 (Keyboard Driven):** Standard counter billing must be achievable 100% via keyboard shortcuts without needing a mouse.
-- **NFR-USE-02 (Printer Support):** Direct support for 80mm and 58mm ESC/POS thermal receipt printers and standard Windows A4/A5 laser/inkjet printers.
+- **NFR-USE-02 (Hardware Printing Status):** Physical printer integration (ESC/POS thermal & A4 drivers) is **temporarily excluded / deferred**. Slips and bills are rendered and previewed digitally on-screen.
 
 ---
 
@@ -162,7 +162,7 @@ Every requirement below is directly traceable to the provided business requireme
 - Product catalog and landed purchase cost management.
 - Import inventory receiving (stock inwards).
 - Order entry and booker assignment.
-- Dispatch slip generation and printing.
+- Dispatch slip generation and digital on-screen preview.
 - Retail shop profile management and shop-specific invoicing.
 - Atomic stock reduction on invoice issuance.
 - Order Booker performance and daily order reconciliation (collected vs pending).
@@ -173,6 +173,7 @@ Every requirement below is directly traceable to the provided business requireme
 
 ### 6.2 Explicitly Out-of-Scope
 *(Preventing feature creep and keeping the system focused on the core wholesale business)*
+- Physical hardware printer drivers and direct ESC/POS thermal printing integration (temporarily excluded for the time being; digital slips & bills only).
 - Customer-facing public e-commerce portal or website.
 - Online credit card / payment gateway processing (operations are physical cash, bank deposit, or Khata credit).
 - Multi-currency forex trading calculations (all transactions recorded in local base currency).
