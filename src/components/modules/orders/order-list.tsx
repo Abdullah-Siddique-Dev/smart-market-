@@ -3,6 +3,7 @@ import { useOrders } from '@/lib/queries/use-orders';
 import { Order } from '@/types/entities';
 import { DataTable, ColumnDef } from '@/components/shared/data-table';
 import { OrderStatusBadge } from './order-status-badge';
+import { OrderSourceBadge } from './order-source-badge';
 import { OrderDetail } from './order-detail';
 import { OrderForm } from './order-form';
 import { AmountDisplay } from '@/components/shared/amount-display';
@@ -86,9 +87,20 @@ export const OrderList: React.FC = () => {
       className: 'font-semibold text-foreground text-xs',
     },
     {
+      header: 'Source',
+      cell: (order) => <OrderSourceBadge source={order.order_source} />,
+    },
+    {
       header: 'Order Booker',
-      accessorKey: 'booker_name',
-      className: 'text-xs text-muted-foreground',
+      cell: (order) => (
+        <span className="text-xs text-muted-foreground">
+          {order.booker_name && order.booker_name !== 'Direct Counter' ? (
+            order.booker_name
+          ) : (
+            <span className="italic text-muted-foreground/70">Direct / None</span>
+          )}
+        </span>
+      ),
     },
     {
       header: 'Date',
@@ -160,17 +172,17 @@ export const OrderList: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl font-bold tracking-tight text-foreground">Pre-Booking Orders</h1>
+            <h1 className="text-xl font-bold tracking-tight text-foreground">Wholesale Orders & Intake</h1>
             <kbd className="kbd text-[10px]">F2</kbd>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Manage wholesale orders taken by bookers, dispatch slips, and invoice conversion
+            Central intake console for WhatsApp, voice note, phone, and field booker orders
           </p>
         </div>
 
         <Button onClick={() => setIsFormOpen(true)} className="gap-2 font-semibold shadow-xs">
           <Plus className="h-4 w-4" />
-          <span>New Wholesale Order</span>
+          <span>Record New Order</span>
         </Button>
       </div>
 

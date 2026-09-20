@@ -122,6 +122,24 @@ async function runSmokeTests() {
     const orderId = orderJson.data.id;
     console.log(`   ✅ Order Created: ${orderJson.data.order_number} (Amount: $${orderJson.data.total_amount})`);
 
+    // 6b. Testing Manual WhatsApp Order Creation (No Booker, Single Operator Console)
+    const waOrderRes = await fetch(`${baseUrl}/orders`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Cookie: cookie },
+      body: JSON.stringify({
+        shop_id: shopId,
+        order_booker_id: null,
+        order_source: 'MANUAL_WHATSAPP',
+        notes: 'Received via WhatsApp voice note from shopkeeper',
+        items: [{ product_id: productId, quantity: 2, unit_price: 150 }],
+      }),
+    });
+    const waOrderJson = await waOrderRes.json();
+    if (!waOrderJson.success || waOrderJson.data.order_source !== 'MANUAL_WHATSAPP') {
+      throw new Error(`WhatsApp order creation failed: ${JSON.stringify(waOrderJson)}`);
+    }
+    console.log(`   ✅ Manual WhatsApp Order Intake Verified: ${waOrderJson.data.order_number} (Source: ${waOrderJson.data.order_source}, Booker: ${waOrderJson.data.booker_name})`);
+
     // 7. Generate Dispatch Slip
     console.log('7️⃣ Testing Dispatch Slip Generation...');
     const slipRes = await fetch(`${baseUrl}/orders/${orderId}/dispatch`, {
@@ -148,12 +166,30 @@ async function runSmokeTests() {
     }
     console.log(`   ✅ Bill Created: ${billJson.bill.bill_number} (Stock Deducted: true)`);
 
+    // 8b. Testing Direct Counter Bill Creation (No Booker)
+    const directBillRes = await fetch(`${baseUrl}/bills`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Cookie: cookie },
+      body: JSON.stringify({
+        shop_id: shopId,
+        order_booker_id: null,
+        payment_status: 'PAID',
+        paid_amount: 300,
+        items: [{ product_id: productId, quantity: 2, unit_selling_price: 150 }],
+      }),
+    });
+    const directBillJson = await directBillRes.json();
+    if (!directBillJson.success || !directBillJson.bill.stock_deducted) {
+      throw new Error(`Direct counter bill failed: ${JSON.stringify(directBillJson)}`);
+    }
+    console.log(`   ✅ Direct Counter Bill Verified (No Booker): ${directBillJson.bill.bill_number}`);
+
     // 9. Verify Stock Count Decrement in Database
     const updatedProd = db.prepare('SELECT current_stock FROM products WHERE id = ?').get(productId) as {
       current_stock: number;
     };
-    if (updatedProd.current_stock !== 40) {
-      throw new Error(`Expected stock to be 40 (50 - 10), got ${updatedProd.current_stock}`);
+    if (updatedProd.current_stock !== 38) {
+      throw new Error(`Expected stock to be 38 (50 - 10 - 2), got ${updatedProd.current_stock}`);
     }
     console.log(`   ✅ Atomic Verification: Warehouse stock correctly decremented from 50 -> ${updatedProd.current_stock}`);
 

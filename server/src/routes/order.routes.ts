@@ -9,7 +9,8 @@ const router = Router();
 const createOrderSchema = z.object({
   body: z.object({
     shop_id: z.number().int().positive('Valid shop ID is required'),
-    order_booker_id: z.number().int().positive('Valid order booker ID is required'),
+    order_booker_id: z.number().int().positive('Valid order booker ID must be positive').nullable().optional(),
+    order_source: z.enum(['MANUAL_WHATSAPP', 'MANUAL_IN_PERSON', 'DIRECT_PHONE', 'DIRECT_WALKIN']).optional(),
     order_date: z.string().optional(),
     notes: z.string().optional(),
     items: z.array(

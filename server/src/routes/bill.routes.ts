@@ -10,7 +10,7 @@ const createBillSchema = z.object({
   body: z.object({
     order_id: z.number().int().positive().optional(),
     shop_id: z.number().int().positive('Shop ID is required'),
-    order_booker_id: z.number().int().positive('Booker ID is required'),
+    order_booker_id: z.number().int().positive('Booker ID must be positive').nullable().optional(),
     items: z.array(
       z.object({
         product_id: z.number().int().positive(),

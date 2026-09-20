@@ -61,9 +61,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   const selectedShop = shops.find((s) => s.id === selectedShopId);
   const selectedBooker = bookers.find((b) => b.id === selectedBookerId);
 
-  // Fallbacks if user didn't pick a specific shop/booker in POS
+  // Fallbacks if user didn't pick a specific shop in POS
   const effectiveShopId = selectedShopId || (shops.length > 0 ? shops[0].id : 1);
-  const effectiveBookerId = selectedBookerId || (bookers.length > 0 ? bookers[0].id : 1);
+  const effectiveBookerId = selectedBookerId || undefined;
 
   const actualPaidAmount =
     paymentStatus === 'PAID'
@@ -83,11 +83,6 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
     if (shops.length === 0) {
       setError('No retail shop available in database. Please register a shop first.');
-      return;
-    }
-
-    if (bookers.length === 0) {
-      setError('No order booker available in database. Please register a booker first.');
       return;
     }
 
@@ -163,7 +158,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
             <div className="flex justify-between">
               <span className="text-muted-foreground">Attributed Booker:</span>
               <span className="font-semibold text-foreground">
-                {selectedBooker ? selectedBooker.name : 'Default Direct Booker'}
+                {selectedBooker ? selectedBooker.name : 'Direct Counter Sale (No Booker)'}
               </span>
             </div>
           </div>

@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { OrderStatusBadge } from './order-status-badge';
+import { OrderSourceBadge } from './order-source-badge';
 import { AmountDisplay } from '@/components/shared/amount-display';
 import { formatDateTime } from '@/lib/utils/date';
 import { Package, Truck, XCircle, CheckCircle, FileText } from 'lucide-react';
@@ -55,7 +56,10 @@ export const OrderDetail: React.FC<OrderDetailProps> = ({
               <span>Order Details</span>
               {order && <span className="font-mono text-sm">#{order.order_number}</span>}
             </DialogTitle>
-            {order && <OrderStatusBadge status={order.status} />}
+            <div className="flex items-center gap-2">
+              {order && <OrderSourceBadge source={order.order_source} />}
+              {order && <OrderStatusBadge status={order.status} />}
+            </div>
           </div>
         </DialogHeader>
 
@@ -77,10 +81,16 @@ export const OrderDetail: React.FC<OrderDetailProps> = ({
 
               <div className="p-3 rounded-lg border border-border/80 bg-muted/20 space-y-1">
                 <span className="text-[10px] font-semibold uppercase text-muted-foreground tracking-wider">
-                  Assigned Order Booker
+                  Attributed Booker
                 </span>
-                <div className="font-bold text-sm text-foreground">{order.booker_name}</div>
-                <div className="text-muted-foreground text-[11px]">Created By: {order.creator_name}</div>
+                <div className="font-bold text-sm text-foreground">
+                  {order.booker_name && order.booker_name !== 'Direct Counter' ? (
+                    order.booker_name
+                  ) : (
+                    <span className="text-muted-foreground font-normal italic">Direct Sale / No Booker</span>
+                  )}
+                </div>
+                <div className="text-muted-foreground text-[11px]">Recorded By: {order.creator_name}</div>
               </div>
             </div>
 
@@ -146,17 +156,19 @@ export const OrderDetail: React.FC<OrderDetailProps> = ({
                   <XCircle className="h-3.5 w-3.5" />
                   <span>Cancel Order</span>
                 </Button>
-                <Button
-                  type="button"
-                  variant="default"
-                  size="sm"
-                  onClick={handleDispatch}
-                  disabled={dispatchOrder.isPending}
-                  className="gap-1.5 text-xs bg-blue-600 hover:bg-blue-700"
-                >
-                  <Truck className="h-3.5 w-3.5" />
-                  <span>Mark Dispatched</span>
-                </Button>
+                {order.order_booker_id && (
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="sm"
+                    onClick={handleDispatch}
+                    disabled={dispatchOrder.isPending}
+                    className="gap-1.5 text-xs bg-blue-600 hover:bg-blue-700"
+                  >
+                    <Truck className="h-3.5 w-3.5" />
+                    <span>Mark Dispatched</span>
+                  </Button>
+                )}
               </>
             )}
 

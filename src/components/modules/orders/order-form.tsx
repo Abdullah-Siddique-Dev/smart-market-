@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useOrderMutations } from '@/lib/queries/use-orders';
 import { Product } from '@/types/entities';
+import { OrderSource } from '@/types/enums';
 import {
   Dialog,
   DialogContent,
@@ -15,7 +16,19 @@ import { ShopSelector } from '@/components/shared/shop-selector';
 import { BookerSelector } from '@/components/shared/booker-selector';
 import { ProductSearch } from '@/components/shared/product-search';
 import { AmountDisplay } from '@/components/shared/amount-display';
-import { Trash2, Plus, Minus, Package, AlertCircle, Loader2 } from 'lucide-react';
+import {
+  Trash2,
+  Plus,
+  Minus,
+  Package,
+  AlertCircle,
+  Loader2,
+  MessageSquare,
+  UserCheck,
+  PhoneCall,
+  Store,
+} from 'lucide-react';
+import { cn } from '@/lib/utils/cn';
 
 interface OrderItemEntry {
   product: Product;
@@ -37,6 +50,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
 }) => {
   const [shopId, setShopId] = useState<number | null>(null);
   const [bookerId, setBookerId] = useState<number | null>(null);
+  const [orderSource, setOrderSource] = useState<OrderSource>('MANUAL_WHATSAPP');
   const [items, setItems] = useState<OrderItemEntry[]>([]);
   const [notes, setNotes] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -95,10 +109,6 @@ export const OrderForm: React.FC<OrderFormProps> = ({
       setError('Please select a retail shop');
       return;
     }
-    if (!bookerId) {
-      setError('Please select an order booker');
-      return;
-    }
     if (items.length === 0) {
       setError('Please add at least one product item');
       return;
@@ -108,7 +118,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({
       setError(null);
       const res = await createOrder.mutateAsync({
         shop_id: shopId,
-        order_booker_id: bookerId,
+        order_booker_id: bookerId || undefined,
+        order_source: orderSource,
         notes: notes.trim() || undefined,
         items: items.map((i) => ({
           product_id: i.product.id,
@@ -119,6 +130,8 @@ export const OrderForm: React.FC<OrderFormProps> = ({
 
       setItems([]);
       setNotes('');
+      setOrderSource('MANUAL_WHATSAPP');
+      setBookerId(null);
       onOpenChange(false);
       if (onOrderCreated && res && (res as any).id) {
         onOrderCreated((res as any).id);
@@ -134,10 +147,10 @@ export const OrderForm: React.FC<OrderFormProps> = ({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Package className="h-5 w-5 text-primary" />
-            <span>Create Wholesale Pre-Booking Order</span>
+            <span>Record Wholesale Order (Manual Intake)</span>
           </DialogTitle>
           <DialogDescription>
-            Record order placed by booker for shop fulfillment
+            Enter customer orders received via WhatsApp, voice note, phone, or in-person booker visit
           </DialogDescription>
         </DialogHeader>
 
@@ -148,6 +161,68 @@ export const OrderForm: React.FC<OrderFormProps> = ({
               <span>{error}</span>
             </div>
           )}
+
+          {/* Intake Channel / Order Source Selector */}
+          <div className="space-y-1.5">
+            <label className="font-semibold text-muted-foreground flex items-center justify-between">
+              <span>Order Intake Channel</span>
+              <span className="text-[10px] text-muted-foreground font-normal">How was this order received?</span>
+            </label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button
+                type="button"
+                onClick={() => setOrderSource('MANUAL_WHATSAPP')}
+                className={cn(
+                  'flex items-center justify-center gap-1.5 p-2 rounded-lg border text-xs font-semibold transition-all',
+                  orderSource === 'MANUAL_WHATSAPP'
+                    ? 'border-emerald-500 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 shadow-xs'
+                    : 'border-border/80 hover:bg-muted/50 text-muted-foreground'
+                )}
+              >
+                <MessageSquare className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
+                <span>WhatsApp</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setOrderSource('MANUAL_IN_PERSON')}
+                className={cn(
+                  'flex items-center justify-center gap-1.5 p-2 rounded-lg border text-xs font-semibold transition-all',
+                  orderSource === 'MANUAL_IN_PERSON'
+                    ? 'border-blue-500 bg-blue-500/10 text-blue-700 dark:text-blue-400 shadow-xs'
+                    : 'border-border/80 hover:bg-muted/50 text-muted-foreground'
+                )}
+              >
+                <UserCheck className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" />
+                <span>Booker Visit</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setOrderSource('DIRECT_PHONE')}
+                className={cn(
+                  'flex items-center justify-center gap-1.5 p-2 rounded-lg border text-xs font-semibold transition-all',
+                  orderSource === 'DIRECT_PHONE'
+                    ? 'border-indigo-500 bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 shadow-xs'
+                    : 'border-border/80 hover:bg-muted/50 text-muted-foreground'
+                )}
+              >
+                <PhoneCall className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-400" />
+                <span>Phone Call</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setOrderSource('DIRECT_WALKIN')}
+                className={cn(
+                  'flex items-center justify-center gap-1.5 p-2 rounded-lg border text-xs font-semibold transition-all',
+                  orderSource === 'DIRECT_WALKIN'
+                    ? 'border-purple-500 bg-purple-500/10 text-purple-700 dark:text-purple-400 shadow-xs'
+                    : 'border-border/80 hover:bg-muted/50 text-muted-foreground'
+                )}
+              >
+                <Store className="h-3.5 w-3.5 text-purple-600 dark:text-purple-400" />
+                <span>Walk-In</span>
+              </button>
+            </div>
+          </div>
 
           {/* Shop & Booker Selection */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -161,11 +236,15 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             </div>
 
             <div className="space-y-1">
-              <label className="font-semibold text-muted-foreground">Order Booker *</label>
+              <label className="font-semibold text-muted-foreground flex items-center justify-between">
+                <span>Attributed Booker</span>
+                <span className="text-[10px] text-muted-foreground font-normal">Optional</span>
+              </label>
               <BookerSelector
                 value={bookerId}
                 onChange={(bId) => setBookerId(bId)}
-                allowNone={false}
+                allowNone={true}
+                noneLabel="Direct / No Booker Assigned"
               />
             </div>
           </div>
@@ -258,7 +337,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
             <div className="flex-1">
               <Input
                 type="text"
-                placeholder="Optional order notes / delivery instructions..."
+                placeholder="e.g. Pasted WhatsApp text, voice note summary, or physical slip #..."
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 className="h-8 text-xs"
@@ -292,7 +371,7 @@ export const OrderForm: React.FC<OrderFormProps> = ({
                   <span>Saving Order...</span>
                 </>
               ) : (
-                <span>Save Order</span>
+                <span>Save Wholesale Order</span>
               )}
             </Button>
           </DialogFooter>
