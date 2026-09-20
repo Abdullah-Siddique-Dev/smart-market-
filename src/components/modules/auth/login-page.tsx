@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { authApi } from '@/lib/api/auth.api';
 import { Input } from '@/components/ui/input';
@@ -12,7 +13,15 @@ export const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const setUser = useAuthStore((state) => state.setUser);
+  const navigate = useNavigate();
+  const { setUser, isAuthenticated, user } = useAuthStore();
+
+  // If already logged in, redirect straight to the terminal
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      navigate('/billing', { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +36,7 @@ export const LoginPage: React.FC = () => {
       const res = await authApi.login({ username, password });
       if (res.success && res.user) {
         setUser(res.user);
+        navigate('/billing', { replace: true });
       } else {
         setError(res.message || 'Invalid credentials');
       }
