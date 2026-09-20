@@ -66,17 +66,21 @@
 
 ## 4. Current Implementation Status
 
-- **Current State:** **Greenfield (Project Documentation Phase Complete).**
+- **Current State:** **Backend REST API Fully Implemented & Tested.**
 - **Completed Deliverables:**
-  - `prd.md` (Product Requirements Document)
-  - `architecture.md` (System & Technical Architecture)
-  - `datamodels.md` (Data Models & Entity Relationships)
-  - `design.md` (UI/UX Design Specification)
-  - `phases.md` (Implementation Roadmap & Phases)
-  - `memory.md` (This document)
-  - `rules.md` (AI Coding Agent Development Rules)
-- **Completed Code Phases:** None (Application code has not been started).
-- **Next Immediate Action:** Begin **Phase 1: Foundation & Desktop Shell** as outlined in `phases.md`.
+  - `prd.md`, `architecture.md`, `datamodels.md`, `design.md`, `phases.md`, `rules.md`
+  - `server/` (Complete Express.js REST API Backend in TypeScript)
+    - 10 Domain Modules (Auth, Products, Imports, Orders, Slips, Bills, Shops, Bookers, Reports, Audit, System)
+    - Passport.js Local Strategy with session cookies & CORS
+    - SQLite database with WAL mode, foreign keys, and DDL schema
+    - Atomic billing transaction (bill + stock deduction + immutable ledger)
+    - 11-suite automated smoke test (`npm run test:smoke` passing 100%)
+- **Completed Code Phases:**
+  - Phase 1 (Backend API Foundation)
+  - Phase 2 (Embedded Database & Schema Migration Engine)
+  - Phase 3 (Authentication with Passport.js, Cookies & RBAC)
+  - Core Domain Endpoints for Phases 4-13 implemented at API layer.
+- **Next Immediate Action:** Begin frontend client integration (Tauri desktop shell + React 19 UI).
 
 ---
 
