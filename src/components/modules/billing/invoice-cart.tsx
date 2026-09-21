@@ -5,7 +5,7 @@ import { ProductLineItem } from './product-line-item';
 import { ShopSelector } from '@/components/shared/shop-selector';
 import { BookerSelector } from '@/components/shared/booker-selector';
 import { formatCurrency } from '@/lib/utils/currency';
-import { ShoppingCart, Plus, Package, ScanBarcode, Sparkles } from 'lucide-react';
+import { ShoppingCart, Plus, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils/cn';
 
 export const InvoiceCart: React.FC = () => {
@@ -65,7 +65,7 @@ export const InvoiceCart: React.FC = () => {
                 Invoice Cart is Empty
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Scan barcode, search by SKU/name with <kbd>F2</kbd>, or click any popular item below to start billing.
+                Search by SKU or name with <kbd>F2</kbd>, or click any popular item below to start billing.
               </p>
             </div>
 

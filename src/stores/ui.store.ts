@@ -4,8 +4,6 @@ interface UiState {
   sidebarCollapsed: boolean;
   toggleSidebar: () => void;
   setSidebarCollapsed: (collapsed: boolean) => void;
-  barcodeInputBuffer: string;
-  setBarcodeInputBuffer: (val: string) => void;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
   setTheme: (theme: 'light' | 'dark') => void;
@@ -15,8 +13,6 @@ export const useUiStore = create<UiState>((set) => ({
   sidebarCollapsed: false,
   toggleSidebar: () => set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
   setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
-  barcodeInputBuffer: '',
-  setBarcodeInputBuffer: (barcodeInputBuffer) => set({ barcodeInputBuffer }),
 
   theme: (localStorage.getItem('smart_market_theme') as 'light' | 'dark') || 'light',
   toggleTheme: () =>

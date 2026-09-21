@@ -217,7 +217,7 @@ export const ProductList: React.FC = () => {
           <Search className="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Search by SKU, barcode, or product name..."
+            placeholder="Search by SKU or product name..."
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);

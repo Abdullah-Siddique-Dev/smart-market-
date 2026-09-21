@@ -76,7 +76,7 @@
 - **Data Caching:** TanStack Query (React Query v5) for automatic cache invalidation and background refetching.
 - **State Management:** Zustand for lightweight POS shopping cart, session auth, and UI states.
 - **Keyboard Ergonomics:** Global hotkey router mapped to physical `F1`–`F8` function keys and `<kbd>` keycaps.
-- **Hardware Barcode Listener:** Global non-blocking keyboard listener capturing hardware USB/Bluetooth barcode scanners.
+- **Fast Keyboard Input:** Global keyboard listener and combobox search prioritizing SKU typing and hotkeys.
 
 ### Service & Backend Layer
 - **Runtime:** Node.js LTS with Express.js REST API.
@@ -94,7 +94,7 @@ All wholesale functionality is consolidated into a single unified workspace:
 
 | Key | Module | Purpose |
 | :--- | :--- | :--- |
-| **`[F1]`** | **Billing POS Terminal** | High-speed retail counter billing, barcode scanning, item discounts, cash/credit settlement. |
+| **`[F1]`** | **Billing POS Terminal** | High-speed retail counter billing, instant SKU search, item discounts, cash/credit settlement. |
 | **`[F2]`** | **Pre-Booking Orders** | Manual order intake from WhatsApp and in-person booker visits; 1-click conversion to bills. |
 | **`[F3]`** | **Warehouse Dispatch Slips** | Custody transfer gate-passes for goods released to bookers; returned goods restock. |
 | **`[F4]`** | **Inventory Catalog & Imports**| Central product catalog, stock levels, inward container shipments, landed purchase costs. |

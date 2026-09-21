@@ -32,7 +32,7 @@ The application operates as a **Single Unified Owner/Operator Dashboard**.
 
 | Key | Module | Description |
 | :--- | :--- | :--- |
-| **`[F1]`** | **Counter POS Billing** | Rapid wholesale invoice creation, barcode scanner support, discount chips, cash settlement. |
+| **`[F1]`** | **Counter POS Billing** | Rapid wholesale invoice creation, high-speed SKU search, discount chips, cash settlement. |
 | **`[F2]`** | **Pre-Booking Orders** | Manual order intake from WhatsApp and in-person visits; 1-click conversion to POS bills. |
 | **`[F3]`** | **Warehouse Dispatch Slips** | Goods custody transfer gate passes for bookers; returned goods reconciliation. |
 | **`[F4]`** | **Inventory Catalog & Imports**| Master product catalog, stock levels, inward container shipments, landed costs. |

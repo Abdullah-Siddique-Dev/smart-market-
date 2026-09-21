@@ -73,6 +73,10 @@
 - **Decision:** Eliminate the `OPERATOR` role tier entirely. The application operates strictly as a **Single-Sided Wholesale Owner Dashboard** where all ERP modules, inventory purchase costs, landed profit calculations, and audit logs are unconditionally available without role restrictions.
 - **Rationale:** The wholesale owner requested a single dashboard with all features implemented directly on the owner side, without multi-user role boundaries or restricted operator modes. All features (F1 through F8) are unlocked directly.
 
+### ADR-11: Hardware Barcode Scanners Excluded in Favor of Rapid Keyboard/SKU Search
+- **Decision:** Remove hardware barcode scanner listener hooks, scanner state buffers, and "Scanner Ready" indicators. Rely exclusively on rapid keyboard input, unique SKU codes, and fast autocomplete search (`F2`).
+- **Rationale:** The wholesale owner clarified that hardware barcode scanners are not part of current operations. Removing global scanner key-timing listeners eliminates window event interception overhead while preserving SKU-based fast typing for wholesale cartons and boxes.
+
 ---
 
 ## 4. Current Implementation Status
@@ -99,4 +103,6 @@
 2. **Bookers Have No App Access:** Never create external login screens or mobile clients for bookers.
 3. **Connectivity:** Strictly offline-capable. No requirement for active internet access.
 4. **Printing Status:** **Temporarily Excluded / Deferred.** Digital on-screen slips only.
-5. **Anti-Corruption Rule:** Every physical stock change must ALWAYS create an `inventory_ledger` row.
+5. **Scanner Status:** **Temporarily Excluded / Removed.** Fast keyboard typing & SKU search only.
+6. **Anti-Corruption Rule:** Every physical stock change must ALWAYS create an `inventory_ledger` row.
+

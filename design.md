@@ -42,12 +42,12 @@ The desktop shell utilizes an enterprise single-console workspace:
 ### 2.1 Top System Status Bar
 - **Brand & POS Mode:** Smart Market OS logo with active mode tag.
 - **Database Status Indicator:** Pulsing green badge `SQLite WAL Active`.
-- **User Profile Pill:** User avatar circle with name and role tag (`OWNER` / `OPERATOR`).
+- **User Profile Pill:** User avatar circle with name and role tag (`OWNER`).
 - **Live Clock:** Real-time clock for timestamping counter bills.
 
 ### 2.2 Left Navigation Sidebar
 Collapsible navigation sidebar with tactile `<kbd>` keycaps:
-- **`[F1]` Counter POS Billing:** Rapid wholesale invoice creation, barcode scanning, and cash settlement.
+- **`[F1]` Counter POS Billing:** Rapid wholesale invoice creation, instant SKU search, and cash settlement.
 - **`[F2]` Pre-Booking Orders:** Manual intake from WhatsApp and in-person booker visits; 1-click bill conversion.
 - **`[F3]` Dispatch Slips:** Warehouse gate-passes for goods released to order bookers.
 - **`[F4]` Inventory & Imports:** Central catalog, stock levels, and inward container receiving.
@@ -64,7 +64,7 @@ Two-pane split terminal optimized for sub-second billing:
 
 ```
 ┌────────────────────────────────────────────────────────┬─────────────────────────┐
-│ SEARCH PRODUCT: [ SKU / Barcode / Name (F2) ]          │ INVOICE SUMMARY         │
+│ SEARCH PRODUCT: [ SKU / Product Name (F2) ]            │ INVOICE SUMMARY         │
 ├────────────────────────────────────────────────────────┼─────────────────────────┤
 │ # │ SKU   │ Product Name │ Qty │ Unit │ Rate │ Total   │ Shop: [ Select Shop ▼ ] │
 │───┼───────┼──────────────┼─────┼──────┼──────┼─────────┤ Booker: [ Optional ▼ ]  │
@@ -81,7 +81,7 @@ Two-pane split terminal optimized for sub-second billing:
 ```
 
 - **Quick-Add Catalog:** The empty cart displays 1-click quick-add wholesale tiles so cashiers never face a blank void.
-- **Hardware Barcode Scanner Pill:** Live green pulsing status showing hardware scanner readiness.
+- **High-Speed SKU Search & Hotkeys:** Instant search dropdown with F2 hotkey and quick arrow selection.
 - **Settlement Panel:** Bold Net Payable card with instant discount presets (2%, 5%, 10%) and glowing green settlement button.
 
 ---

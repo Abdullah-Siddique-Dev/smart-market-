@@ -15,7 +15,7 @@ interface ProductSearchProps {
 
 export const ProductSearch: React.FC<ProductSearchProps> = ({
   onSelect,
-  placeholder = 'Search catalog by SKU, product name, or scan barcode (F2)...',
+  placeholder = 'Search catalog by SKU or product name (F2)...',
   autoFocus = false,
   className,
 }) => {

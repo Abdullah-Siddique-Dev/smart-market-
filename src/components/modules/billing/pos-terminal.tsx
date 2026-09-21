@@ -1,22 +1,19 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { useCartStore } from '@/stores/cart.store';
 import { ProductSearch } from '@/components/shared/product-search';
 import { InvoiceCart } from './invoice-cart';
 import { InvoiceSummary } from './invoice-summary';
 import { PaymentModal } from './payment-modal';
 import { BillPrintPreview } from './bill-print-preview';
-import { useBarcodeScanner } from '@/hooks/use-barcode-scanner';
-import { inventoryApi } from '@/lib/api/inventory.api';
 import { Product } from '@/types/entities';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { Card } from '@/components/ui/card';
-import { ScanBarcode, Sparkles, Command, Keyboard } from 'lucide-react';
+import { Keyboard } from 'lucide-react';
 
 export const PosTerminal: React.FC = () => {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
   const [createdBillId, setCreatedBillId] = useState<number | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-  const [scanNotice, setScanNotice] = useState<string | null>(null);
 
   const addItem = useCartStore((state) => state.addItem);
   const items = useCartStore((state) => state.items);
@@ -29,30 +26,6 @@ export const PosTerminal: React.FC = () => {
     }
   });
 
-  // Handle hardware barcode scan
-  const handleBarcodeScan = useCallback(
-    async (code: string) => {
-      try {
-        setScanNotice(`Scanning barcode: ${code}...`);
-        const searchResults = await inventoryApi.searchProducts(code);
-        if (searchResults && searchResults.length > 0) {
-          const matched = searchResults[0];
-          addItem(matched, 1);
-          setScanNotice(`Added: ${matched.name}`);
-        } else {
-          setScanNotice(`No product found for SKU/Barcode: ${code}`);
-        }
-      } catch {
-        setScanNotice(`Error looking up product: ${code}`);
-      } finally {
-        setTimeout(() => setScanNotice(null), 3000);
-      }
-    },
-    [addItem]
-  );
-
-  useBarcodeScanner(handleBarcodeScan);
-
   const handleProductSelect = (product: Product) => {
     addItem(product, 1);
   };
@@ -64,28 +37,15 @@ export const PosTerminal: React.FC = () => {
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)] gap-3.5 p-4 bg-background">
-      {/* Top Controls: Fast Product Search Bar & Hardware Scanner Indicator */}
+      {/* Top Controls: Fast Product Search Bar */}
       <div className="flex items-center gap-3 bg-card p-3 rounded-2xl border border-border shadow-xs">
         <div className="flex-1 relative">
           <ProductSearch
             onSelect={handleProductSelect}
             autoFocus={true}
-            placeholder="Search product catalog by SKU, name, or scan barcode (F2)..."
+            placeholder="Search product catalog by SKU or name (F2)..."
           />
         </div>
-
-        <div className="hidden md:flex items-center gap-2 px-3 py-2 rounded-xl bg-muted/60 border border-border text-xs text-muted-foreground shrink-0 font-medium">
-          <ScanBarcode className="h-4 w-4 text-primary animate-pulse" />
-          <span>Scanner Ready</span>
-          <span className="h-2 w-2 rounded-full bg-emerald-500 ml-1" />
-        </div>
-
-        {scanNotice && (
-          <div className="text-xs font-semibold text-primary animate-in fade-in flex items-center gap-1.5 bg-primary/10 px-3 py-2 rounded-xl border border-primary/20">
-            <Sparkles className="h-3.5 w-3.5" />
-            <span>{scanNotice}</span>
-          </div>
-        )}
       </div>
 
       {/* Main Terminal Workspace: Left = Cart Items Table, Right = Summary & Checkout */}
@@ -123,8 +83,8 @@ export const PosTerminal: React.FC = () => {
                 <kbd>Esc</kbd>
               </div>
               <div className="p-2 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between">
-                <span className="text-muted-foreground text-[11px]">Barcode Scan</span>
-                <kbd>Auto</kbd>
+                <span className="text-muted-foreground text-[11px]">Select Item</span>
+                <kbd>Enter</kbd>
               </div>
             </div>
           </Card>
