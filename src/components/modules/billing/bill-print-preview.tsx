@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { AmountDisplay } from '@/components/shared/amount-display';
 import { StatusBadge } from '@/components/shared/status-badge';
 import { formatDateTime } from '@/lib/utils/date';
-import { CheckCircle2, Copy } from 'lucide-react';
+import { CheckCircle2, Copy, Download } from 'lucide-react';
 import { useBill } from '@/lib/queries/use-bills';
 
 interface BillPrintPreviewProps {
@@ -25,11 +25,60 @@ export const BillPrintPreview: React.FC<BillPrintPreviewProps> = ({
   onOpenChange,
 }) => {
   const { data: bill, isLoading } = useBill(billId || 0);
+  const invoiceRef = React.useRef<HTMLDivElement>(null);
 
   const handleCopySummary = () => {
     if (!bill) return;
     const text = `INVOICE: ${bill.bill_number}\nShop: ${bill.shop_name}\nDate: ${bill.bill_date}\nNet Total: Rs. ${bill.net_amount}\nStatus: ${bill.payment_status}`;
     navigator.clipboard.writeText(text);
+  };
+
+  const handleDownload = () => {
+    if (!invoiceRef.current || !bill) return;
+    const printWindow = window.open('', '_blank', 'width=420,height=600');
+    if (!printWindow) return;
+    const content = invoiceRef.current.innerHTML;
+    printWindow.document.write(`<!DOCTYPE html><html><head><title>Invoice ${bill.bill_number}</title><style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: system-ui, -apple-system, sans-serif; font-size: 12px; padding: 16px; color: #111; }
+      table { width: 100%; border-collapse: collapse; }
+      th, td { padding: 4px 2px; text-align: left; }
+      th { font-size: 10px; text-transform: uppercase; color: #666; border-bottom: 1px solid #ddd; }
+      td { font-size: 11px; }
+      .font-mono { font-family: 'Courier New', monospace; }
+      .font-bold, .font-black { font-weight: 700; }
+      .font-semibold { font-weight: 600; }
+      .font-medium { font-weight: 500; }
+      .text-center { text-align: center; }
+      .text-right { text-align: right; }
+      .text-emerald-600 { color: #059669; }
+      .text-amber-600 { color: #d97706; }
+      .text-muted-foreground { color: #6b7280; }
+      .text-foreground { color: #111827; }
+      .space-y-1 > * + * { margin-top: 4px; }
+      .space-y-4 > * + * { margin-top: 16px; }
+      .border-t { border-top: 1px solid #e5e7eb; }
+      .border-b { border-bottom: 1px solid #e5e7eb; }
+      .divide-y > * + * { border-top: 1px solid #f3f4f6; }
+      .grid { display: grid; }
+      .grid-cols-2 { grid-template-columns: 1fr 1fr; }
+      .gap-2 { gap: 8px; }
+      .flex { display: flex; }
+      .items-center { align-items: center; }
+      .justify-between { justify-content: space-between; }
+      .justify-center { justify-content: center; }
+      .pt-1 { padding-top: 4px; }
+      .pt-2 { padding-top: 8px; }
+      .py-1 { padding-top: 4px; padding-bottom: 4px; }
+      .py-2 { padding-top: 8px; padding-bottom: 8px; }
+      .pb-3 { padding-bottom: 12px; }
+      .pr-2 { padding-right: 8px; }
+      h2 { font-size: 18px; letter-spacing: -0.025em; }
+      @media print { body { padding: 0; } }
+    </style></head><body>${content}</body></html>`);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => { printWindow.print(); printWindow.close(); }, 300);
   };
 
   if (!billId) return null;
@@ -51,7 +100,7 @@ export const BillPrintPreview: React.FC<BillPrintPreviewProps> = ({
         ) : (
           <div className="space-y-4 font-sans text-xs">
             {/* Thermal / Digital Slip Container */}
-            <div className="p-4 rounded-xl border border-border/80 bg-background shadow-inner space-y-4">
+            <div ref={invoiceRef} className="p-4 rounded-xl border border-border/80 bg-background shadow-inner space-y-4">
               {/* Header */}
               <div className="text-center border-b border-border/60 pb-3 space-y-1">
                 <h2 className="text-lg font-black tracking-tight text-foreground">
@@ -166,16 +215,28 @@ export const BillPrintPreview: React.FC<BillPrintPreviewProps> = ({
         )}
 
         <DialogFooter className="print:hidden mt-2 flex items-center justify-between sm:justify-between w-full">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleCopySummary}
-            className="gap-1.5"
-          >
-            <Copy className="h-3.5 w-3.5" />
-            <span>Copy Invoice Details</span>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCopySummary}
+              className="gap-1.5"
+            >
+              <Copy className="h-3.5 w-3.5" />
+              <span>Copy Invoice Details</span>
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleDownload}
+              className="gap-1.5"
+            >
+              <Download className="h-3.5 w-3.5" />
+              <span>Download</span>
+            </Button>
+          </div>
 
           <Button type="button" size="sm" onClick={() => onOpenChange(false)}>
             Close
