@@ -10,6 +10,7 @@ import { KpiCards } from './kpi-cards';
 import { SalesProfitChart } from './sales-profit-chart';
 import { TopProductsChart } from './top-products-chart';
 import { BookerLeaderboard } from './booker-leaderboard';
+import { ProfitCalculator } from './profit-calculator';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Calendar, RefreshCw, BarChart3 } from 'lucide-react';
@@ -115,6 +116,9 @@ export const ProfitDashboard: React.FC = () => {
 
       {/* Primary KPI Metrics */}
       <KpiCards data={profitData} isLoading={isProfitLoading} />
+
+      {/* On-Demand Daily Profit Simulator (By Quantity & Price) */}
+      <ProfitCalculator />
 
       {/* Visual Chart */}
       <SalesProfitChart timeline={salesData?.timeline || []} isLoading={isSalesLoading} />

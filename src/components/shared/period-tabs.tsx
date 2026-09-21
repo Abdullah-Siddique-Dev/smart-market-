@@ -1,7 +1,7 @@
 import React from 'react';
 import { cn } from '@/lib/utils/cn';
 
-export type PeriodType = 'today' | 'yesterday' | 'week' | 'month' | 'custom' | 'all';
+export type PeriodType = 'today' | 'yesterday' | '3days' | 'week' | 'month' | 'custom' | 'all';
 
 interface PeriodTabsProps {
   value: PeriodType;
@@ -19,9 +19,10 @@ export const PeriodTabs: React.FC<PeriodTabsProps> = ({
   const tabs: { id: PeriodType; label: string }[] = [
     ...(showAll ? [{ id: 'all' as PeriodType, label: 'All Time' }] : []),
     { id: 'today', label: 'Today' },
-    { id: 'yesterday', label: 'Yesterday' },
-    { id: 'week', label: 'This Week' },
-    { id: 'month', label: 'This Month' },
+    { id: 'yesterday', label: 'Last Day' },
+    { id: '3days', label: '3-Day' },
+    { id: 'week', label: 'Weekly' },
+    { id: 'month', label: 'Monthly' },
     { id: 'custom', label: 'Custom' },
   ];
 

@@ -33,6 +33,13 @@ export class ReportService {
           whereClauseOrders: "WHERE date(o.order_date) = date('now', 'localtime')",
           params: [],
         };
+      case 'yesterday':
+      case 'lastday':
+        return {
+          whereClauseBills: "WHERE date(b.bill_date) = date('now', '-1 day', 'localtime')",
+          whereClauseOrders: "WHERE date(o.order_date) = date('now', '-1 day', 'localtime')",
+          params: [],
+        };
       case '3days':
         return {
           whereClauseBills: "WHERE date(b.bill_date) >= date('now', '-2 days', 'localtime')",
