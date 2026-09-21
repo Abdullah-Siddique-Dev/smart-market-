@@ -133,8 +133,7 @@ export const InvoiceSummary: React.FC<InvoiceSummaryProps> = ({ onCheckout }) =>
           )}
         >
           <CreditCard className="h-4 w-4" />
-          <span>Charge & Settle Bill</span>
-          <kbd className="bg-white/20 text-white border-white/30 text-[10px] ml-auto">F1</kbd>
+          <span className="flex-1 text-left">Charge & Settle Bill</span>
           <ArrowRight className="h-4 w-4" />
         </Button>
 

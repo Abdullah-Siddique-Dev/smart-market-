@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth.store';
 import { useUiStore } from '@/stores/ui.store';
-import { useGlobalShortcuts } from '@/hooks/use-global-shortcuts';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -40,8 +39,6 @@ export const AppLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  useGlobalShortcuts();
-
   useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date()), 1000);
     return () => clearInterval(interval);
@@ -53,15 +50,15 @@ export const AppLayout: React.FC = () => {
   };
 
   const navItems = [
-    { to: '/billing', label: 'Billing POS', key: 'F1', icon: CreditCard },
-    { to: '/orders', label: 'Orders', key: 'F2', icon: Package },
-    { to: '/dispatch', label: 'Dispatch', key: 'F3', icon: Truck },
-    { to: '/inventory', label: 'Inventory', key: 'F4', icon: Boxes },
-    { to: '/bookers', label: 'Order Bookers', key: 'F5', icon: Users },
-    { to: '/shops', label: 'Shops & Khata', key: 'F6', icon: Store },
-    { to: '/reports', label: 'Profit Reports', key: 'F7', icon: BarChart3 },
-    { to: '/audit', label: 'Audit Ledger', key: 'F8', icon: ShieldCheck },
-    { to: '/settings', label: 'Settings', key: null, icon: Settings },
+    { to: '/billing', label: 'Billing POS', icon: CreditCard },
+    { to: '/orders', label: 'Orders', icon: Package },
+    { to: '/dispatch', label: 'Dispatch', icon: Truck },
+    { to: '/inventory', label: 'Inventory', icon: Boxes },
+    { to: '/bookers', label: 'Order Bookers', icon: Users },
+    { to: '/shops', label: 'Shops & Khata', icon: Store },
+    { to: '/reports', label: 'Profit Reports', icon: BarChart3 },
+    { to: '/audit', label: 'Audit Ledger', icon: ShieldCheck },
+    { to: '/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -135,21 +132,7 @@ export const AppLayout: React.FC = () => {
                   )}
                 />
                 {!sidebarCollapsed && (
-                  <>
-                    <span className="truncate flex-1 tracking-tight">{item.label}</span>
-                    {item.key && (
-                      <kbd
-                        className={cn(
-                          'transition-colors',
-                          isActive
-                            ? 'bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30 shadow-none'
-                            : 'text-muted-foreground group-hover:text-foreground'
-                        )}
-                      >
-                        {item.key}
-                      </kbd>
-                    )}
-                  </>
+                  <span className="truncate flex-1 tracking-tight">{item.label}</span>
                 )}
               </NavLink>
             );

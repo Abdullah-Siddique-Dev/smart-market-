@@ -67,7 +67,6 @@ export const ProfitDashboard: React.FC = () => {
             <h1 className="text-xl font-bold tracking-tight text-foreground">
               Executive Profit & Sales Analytics
             </h1>
-            <kbd className="kbd text-[10px]">F7</kbd>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             True landed-cost margin calculations, real-time revenue, and wholesale profitability

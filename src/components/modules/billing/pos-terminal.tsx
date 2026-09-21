@@ -6,9 +6,6 @@ import { InvoiceSummary } from './invoice-summary';
 import { PaymentModal } from './payment-modal';
 import { BillPrintPreview } from './bill-print-preview';
 import { Product } from '@/types/entities';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { Card } from '@/components/ui/card';
-import { Keyboard } from 'lucide-react';
 
 export const PosTerminal: React.FC = () => {
   const [isPaymentOpen, setIsPaymentOpen] = useState(false);
@@ -17,14 +14,6 @@ export const PosTerminal: React.FC = () => {
 
   const addItem = useCartStore((state) => state.addItem);
   const items = useCartStore((state) => state.items);
-
-  // Keyboard shortcut F1: Open Checkout / Payment
-  useHotkeys('f1', (e) => {
-    e.preventDefault();
-    if (items.length > 0) {
-      setIsPaymentOpen(true);
-    }
-  });
 
   const handleProductSelect = (product: Product) => {
     addItem(product, 1);
@@ -43,7 +32,7 @@ export const PosTerminal: React.FC = () => {
           <ProductSearch
             onSelect={handleProductSelect}
             autoFocus={true}
-            placeholder="Search product catalog by SKU or name (F2)..."
+            placeholder="Search product catalog by SKU or name..."
           />
         </div>
       </div>
@@ -58,36 +47,6 @@ export const PosTerminal: React.FC = () => {
         {/* Right: Summary & Action Panel (4 Columns) */}
         <div className="lg:col-span-4 flex flex-col gap-3.5">
           <InvoiceSummary onCheckout={() => setIsPaymentOpen(true)} />
-
-          {/* POS Terminal Keybindings Card */}
-          <Card className="p-4 rounded-2xl border-border bg-card shadow-xs text-xs space-y-2.5">
-            <div className="font-bold text-foreground flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <Keyboard className="h-4 w-4 text-primary" />
-                <span>POS Quick Shortcuts</span>
-              </span>
-              <span className="text-[10px] text-muted-foreground font-mono font-medium">Hands-on-keyboard</span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              <div className="p-2 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between">
-                <span className="text-muted-foreground text-[11px]">Pay Bill</span>
-                <kbd>F1</kbd>
-              </div>
-              <div className="p-2 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between">
-                <span className="text-muted-foreground text-[11px]">Search Item</span>
-                <kbd>F2</kbd>
-              </div>
-              <div className="p-2 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between">
-                <span className="text-muted-foreground text-[11px]">Dismiss Dialog</span>
-                <kbd>Esc</kbd>
-              </div>
-              <div className="p-2 rounded-xl bg-muted/40 border border-border/60 flex items-center justify-between">
-                <span className="text-muted-foreground text-[11px]">Select Item</span>
-                <kbd>Enter</kbd>
-              </div>
-            </div>
-          </Card>
         </div>
       </div>
 

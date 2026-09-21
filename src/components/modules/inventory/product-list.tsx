@@ -138,7 +138,6 @@ export const ProductList: React.FC = () => {
             <h1 className="text-xl font-bold tracking-tight text-foreground">
               Inventory Catalog & Receiving
             </h1>
-            <kbd className="kbd text-[10px]">F4</kbd>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             Central wholesale master catalog, stock levels, and inward container receiving

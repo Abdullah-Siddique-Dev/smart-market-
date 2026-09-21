@@ -112,7 +112,6 @@ export const SlipList: React.FC = () => {
             <h1 className="text-xl font-bold tracking-tight text-foreground">
               Warehouse Dispatch Slips
             </h1>
-            <kbd className="kbd text-[10px]">F3</kbd>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             Gate passes for goods released to order bookers and returned unsold stock reconciliation

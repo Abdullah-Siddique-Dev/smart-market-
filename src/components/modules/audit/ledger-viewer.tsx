@@ -117,7 +117,6 @@ export const LedgerViewer: React.FC = () => {
             <h1 className="text-xl font-bold tracking-tight text-foreground">
               Immutable Inventory Audit Ledger
             </h1>
-            <kbd className="kbd text-[10px]">F8</kbd>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             Cryptographically tracked append-only physical stock transactions and variance audits

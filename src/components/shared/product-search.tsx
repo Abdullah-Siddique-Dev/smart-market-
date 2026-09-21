@@ -15,7 +15,7 @@ interface ProductSearchProps {
 
 export const ProductSearch: React.FC<ProductSearchProps> = ({
   onSelect,
-  placeholder = 'Search catalog by SKU or product name (F2)...',
+  placeholder = 'Search catalog by SKU or product name...',
   autoFocus = false,
   className,
 }) => {
@@ -89,11 +89,8 @@ export const ProductSearch: React.FC<ProductSearchProps> = ({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           autoFocus={autoFocus}
-          className="pl-10 pr-12 h-11 text-sm font-medium bg-background border-border shadow-xs focus:ring-2 focus:ring-primary/20 rounded-xl"
+          className="pl-10 pr-4 h-11 text-sm font-medium bg-background border-border shadow-xs focus:ring-2 focus:ring-primary/20 rounded-xl"
         />
-        <div className="absolute right-3 flex items-center gap-1 pointer-events-none">
-          <kbd>F2</kbd>
-        </div>
       </div>
 
       {isOpen && query.trim().length > 0 && (

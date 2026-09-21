@@ -158,7 +158,6 @@ export const ShopList: React.FC = () => {
             <h1 className="text-xl font-bold tracking-tight text-foreground">
               Retail Customers & Khata Ledger
             </h1>
-            <kbd className="kbd text-[10px]">F6</kbd>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             Customer directory, credit limits, outstanding balances, and cash recovery history

@@ -49,9 +49,9 @@
 - **Decision:** Stock movements cannot be updated or deleted in `inventory_ledger`.
 - **Rationale:** Direct fulfillment of the owner's requirement for anti-corruption features. Physical stock in the warehouse must always be mathematically reconcilable against the cumulative sum of ledger transactions.
 
-### ADR-05: Keyboard-First POS UI
-- **Decision:** High-volume billing workflows are bound to keyboard shortcuts (`F1`–`F8`, `Enter`, `Tab`, `Esc`).
-- **Rationale:** Wholesale billing clerks need to process long lists of items in seconds without reaching for a mouse.
+### ADR-05: Standard Navigation over Function Key Hijacking
+- **Decision:** Remove global function key (`F1`–`F8`) hotkey listeners and visual `<kbd>` badges. Rely on clean, standard responsive navigation and intuitive form inputs.
+- **Rationale:** Function keys (such as F1 for Help, F5 for Browser Refresh, F6 for Address Bar) conflict with standard browser/desktop behaviors on Windows. Removing function key overrides provides a clean, predictable, and uncluttered user interface.
 
 ### ADR-06: Physical Hardware Printing Temporarily Excluded
 - **Decision:** Direct ESC/POS thermal printing and physical printer driver integrations are deferred and temporarily excluded from the current scope.
@@ -71,10 +71,10 @@
 
 ### ADR-10: Strictly Single-Sided - Owner Console Only (No Operator Role)
 - **Decision:** Eliminate the `OPERATOR` role tier entirely. The application operates strictly as a **Single-Sided Wholesale Owner Dashboard** where all ERP modules, inventory purchase costs, landed profit calculations, and audit logs are unconditionally available without role restrictions.
-- **Rationale:** The wholesale owner requested a single dashboard with all features implemented directly on the owner side, without multi-user role boundaries or restricted operator modes. All features (F1 through F8) are unlocked directly.
+- **Rationale:** The wholesale owner requested a single dashboard with all features implemented directly on the owner side, without multi-user role boundaries or restricted operator modes. All features are unlocked directly.
 
 ### ADR-11: Hardware Barcode Scanners Excluded in Favor of Rapid Keyboard/SKU Search
-- **Decision:** Remove hardware barcode scanner listener hooks, scanner state buffers, and "Scanner Ready" indicators. Rely exclusively on rapid keyboard input, unique SKU codes, and fast autocomplete search (`F2`).
+- **Decision:** Remove hardware barcode scanner listener hooks, scanner state buffers, and "Scanner Ready" indicators. Rely exclusively on rapid keyboard input, unique SKU codes, and fast autocomplete search.
 - **Rationale:** The wholesale owner clarified that hardware barcode scanners are not part of current operations. Removing global scanner key-timing listeners eliminates window event interception overhead while preserving SKU-based fast typing for wholesale cartons and boxes.
 
 ---
@@ -83,16 +83,16 @@
 
 - **Architecture:** Single unified desktop dashboard for wholesale owner/operator.
 - **Backend:** Express.js + SQLite in WAL mode with Passport.js session auth.
-- **Frontend:** React 19 + Tailwind CSS + TanStack Query with full F1-F8 keyboard navigation.
+- **Frontend:** React 19 + Tailwind CSS + TanStack Query with clean, clutter-free navigation.
 - **Domain Modules:**
-  1. Billing POS Terminal (`F1`)
-  2. Pre-Booking Orders (`F2`) — Supports manual WhatsApp / in-person order registration
-  3. Warehouse Dispatch Slips (`F3`) — Booker gate-passes & reconciliation
-  4. Inventory & Stock Receiving (`F4`) — Catalog & inward imports
-  5. Order Bookers & Field Sales (`F5`) — Booker commissions & route assignments
-  6. Retail Customers & Khata (`F6`) — Customer directory & ledger
-  7. Profit & Sales Analytics (`F7`) — Landed COGS profitability reports
-  8. Immutable Audit Ledger (`F8`) — Cryptographic physical stock audit trail
+  1. Billing POS Terminal
+  2. Pre-Booking Orders — Supports manual WhatsApp / in-person order registration
+  3. Warehouse Dispatch Slips — Booker gate-passes & reconciliation
+  4. Inventory & Stock Receiving — Catalog & inward imports
+  5. Order Bookers & Field Sales — Booker commissions & route assignments
+  6. Retail Customers & Khata — Customer directory & ledger
+  7. Profit & Sales Analytics — Landed COGS profitability reports & interactive profit simulator
+  8. Immutable Audit Ledger — Cryptographic physical stock audit trail
   9. System Settings — Database backup snapshot triggers & security
 
 ---
@@ -104,5 +104,6 @@
 3. **Connectivity:** Strictly offline-capable. No requirement for active internet access.
 4. **Printing Status:** **Temporarily Excluded / Deferred.** Digital on-screen slips only.
 5. **Scanner Status:** **Temporarily Excluded / Removed.** Fast keyboard typing & SKU search only.
-6. **Anti-Corruption Rule:** Every physical stock change must ALWAYS create an `inventory_ledger` row.
+6. **Shortcuts Status:** **Removed.** Clean point-and-click UI without function-key overrides.
+7. **Anti-Corruption Rule:** Every physical stock change must ALWAYS create an `inventory_ledger` row.
 

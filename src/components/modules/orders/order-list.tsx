@@ -173,7 +173,6 @@ export const OrderList: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold tracking-tight text-foreground">Wholesale Orders & Intake</h1>
-            <kbd className="kbd text-[10px]">F2</kbd>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             Central intake console for WhatsApp, voice note, phone, and field booker orders

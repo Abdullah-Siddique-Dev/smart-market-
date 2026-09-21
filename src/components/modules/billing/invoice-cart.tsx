@@ -65,7 +65,7 @@ export const InvoiceCart: React.FC = () => {
                 Invoice Cart is Empty
               </h3>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Search by SKU or name with <kbd>F2</kbd>, or click any popular item below to start billing.
+                Search catalog by SKU or product name, or click any popular item below to start billing.
               </p>
             </div>
 

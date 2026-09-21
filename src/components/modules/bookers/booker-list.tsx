@@ -146,7 +146,6 @@ export const BookerList: React.FC = () => {
             <h1 className="text-xl font-bold tracking-tight text-foreground">
               Order Bookers & Field Sales
             </h1>
-            <kbd className="kbd text-[10px]">F5</kbd>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
             Commission agents, route assignments, performance tracking, and cash reconciliation

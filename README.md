@@ -28,18 +28,18 @@ The application operates as a **Single Unified Owner/Operator Dashboard**.
 
 ---
 
-## 3. Function Key Map (Tactile Ergonomics)
+## 3. Core Wholesale Modules
 
-| Key | Module | Description |
-| :--- | :--- | :--- |
-| **`[F1]`** | **Counter POS Billing** | Rapid wholesale invoice creation, high-speed SKU search, discount chips, cash settlement. |
-| **`[F2]`** | **Pre-Booking Orders** | Manual order intake from WhatsApp and in-person visits; 1-click conversion to POS bills. |
-| **`[F3]`** | **Warehouse Dispatch Slips** | Goods custody transfer gate passes for bookers; returned goods reconciliation. |
-| **`[F4]`** | **Inventory Catalog & Imports**| Master product catalog, stock levels, inward container shipments, landed costs. |
-| **`[F5]`** | **Order Bookers & Field Sales**| Booker directory, territory routes, commission tracking, and daily cash reconciliation. |
-| **`[F6]`** | **Retail Customers & Khata** | Customer directory, credit limits, outstanding Khata balances, and payment receipts. |
-| **`[F7]`** | **Executive Profit Analytics**| True landed COGS profitability, daily revenue, sales vs. cash collection trend charts. |
-| **`[F8]`** | **Immutable Audit Ledger** | Append-only physical stock transaction log with database integrity discrepancy check. |
+| Module | Description |
+| :--- | :--- |
+| **Counter POS Billing** | Rapid wholesale invoice creation, high-speed SKU search, discount presets, cash & credit settlement. |
+| **Pre-Booking Orders** | Manual order intake from WhatsApp and in-person visits; 1-click conversion to POS bills. |
+| **Warehouse Dispatch Slips** | Goods custody transfer gate passes for bookers; returned goods reconciliation. |
+| **Inventory Catalog & Imports**| Master product catalog, stock levels, inward container shipments, landed costs. |
+| **Order Bookers & Field Sales**| Booker directory, territory routes, commission tracking, and daily cash reconciliation. |
+| **Retail Customers & Khata** | Customer directory, credit limits, outstanding Khata balances, and payment receipts. |
+| **Executive Profit Analytics**| True landed COGS profitability, daily revenue, sales vs. cash collection trend charts. |
+| **Immutable Audit Ledger** | Append-only physical stock transaction log with database integrity discrepancy check. |
 
 ---
 

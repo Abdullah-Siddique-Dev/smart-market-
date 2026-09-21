@@ -75,8 +75,7 @@
 - **Data Tables:** TanStack Table v8 with standardized server-side pagination, zebra striping, and empty states.
 - **Data Caching:** TanStack Query (React Query v5) for automatic cache invalidation and background refetching.
 - **State Management:** Zustand for lightweight POS shopping cart, session auth, and UI states.
-- **Keyboard Ergonomics:** Global hotkey router mapped to physical `F1`–`F8` function keys and `<kbd>` keycaps.
-- **Fast Keyboard Input:** Global keyboard listener and combobox search prioritizing SKU typing and hotkeys.
+- **Intuitive UI:** Clean point-and-click navigation and combobox search prioritizing SKU typing.
 
 ### Service & Backend Layer
 - **Runtime:** Node.js LTS with Express.js REST API.
@@ -92,16 +91,16 @@
 
 All wholesale functionality is consolidated into a single unified workspace:
 
-| Key | Module | Purpose |
-| :--- | :--- | :--- |
-| **`[F1]`** | **Billing POS Terminal** | High-speed retail counter billing, instant SKU search, item discounts, cash/credit settlement. |
-| **`[F2]`** | **Pre-Booking Orders** | Manual order intake from WhatsApp and in-person booker visits; 1-click conversion to bills. |
-| **`[F3]`** | **Warehouse Dispatch Slips** | Custody transfer gate-passes for goods released to bookers; returned goods restock. |
-| **`[F4]`** | **Inventory Catalog & Imports**| Central product catalog, stock levels, inward container shipments, landed purchase costs. |
-| **`[F5]`** | **Order Bookers & Field Sales**| Booker profiles, assigned routes/beats, commission percentages, and daily cash reconciliation. |
-| **`[F6]`** | **Retail Customers & Khata** | Customer shop directory, credit limits, outstanding Khata balances, and payment receipts. |
-| **`[F7]`** | **Executive Profit & Analytics**| Landed COGS profitability, daily revenue, sales vs. cash collection trend charts. |
-| **`[F8]`** | **Immutable Audit Ledger** | Append-only physical stock transaction log with database integrity discrepancy check. |
+| Module | Purpose |
+| :--- | :--- |
+| **Billing POS Terminal** | High-speed retail counter billing, instant SKU search, item discounts, cash/credit settlement. |
+| **Pre-Booking Orders** | Manual order intake from WhatsApp and in-person booker visits; 1-click conversion to bills. |
+| **Warehouse Dispatch Slips** | Custody transfer gate-passes for goods released to bookers; returned goods restock. |
+| **Inventory Catalog & Imports**| Central product catalog, stock levels, inward container shipments, landed purchase costs. |
+| **Order Bookers & Field Sales**| Booker profiles, assigned routes/beats, commission percentages, and daily cash reconciliation. |
+| **Retail Customers & Khata** | Customer shop directory, credit limits, outstanding Khata balances, and payment receipts. |
+| **Executive Profit & Analytics**| Landed COGS profitability, daily revenue, sales vs. cash collection trend charts. |
+| **Immutable Audit Ledger** | Append-only physical stock transaction log with database integrity discrepancy check. |
 
 ---
 

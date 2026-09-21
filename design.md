@@ -24,17 +24,16 @@ The desktop shell utilizes an enterprise single-console workspace:
 ┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
 │ [LOGO] Smart Market OS   │ Local SQLite WAL: Active │ Mode: Counter POS │ User: Owner (Admin)    │
 ├──────────────┬───────────────────────────────────────────────────────────────────────────────────┤
-│ [F1] Billing │  Active Module Viewport                                                           │
-│ [F2] Orders  ├───────────────────────────────────────────────────────────────────────────────────┤
-│ [F3] Slips   │                                                                                   │
-│ [F4] Stock   │                      CENTRAL WORKSPACE CONTENT AREA                               │
-│ [F5] Bookers │                (High-Density Metric Strips & Data Grids)                          │
-│ [F6] Shops   │                                                                                   │
-│ [F7] Reports │                                                                                   │
-│ [F8] Audit   │                                                                                   │
-│ [Settings]   │                                                                                   │
+│ Billing POS  │  Active Module Viewport                                                           │
+│ Orders       ├───────────────────────────────────────────────────────────────────────────────────┤
+│ Dispatch     │                                                                                   │
+│ Inventory    │                      CENTRAL WORKSPACE CONTENT AREA                               │
+│ Bookers      │                (High-Density Metric Strips & Data Grids)                          │
+│ Shops & Khata│                                                                                   │
+│ Reports      │                                                                                   │
+│ Audit        │                                                                                   │
+│ Settings     │                                                                                   │
 ├──────────────┤                                                                                   │
-│ [Ctrl+B]     │                                                                                   │
 │ Collapse Nav │                                                                                   │
 └──────────────┴───────────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -46,25 +45,25 @@ The desktop shell utilizes an enterprise single-console workspace:
 - **Live Clock:** Real-time clock for timestamping counter bills.
 
 ### 2.2 Left Navigation Sidebar
-Collapsible navigation sidebar with tactile `<kbd>` keycaps:
-- **`[F1]` Counter POS Billing:** Rapid wholesale invoice creation, instant SKU search, and cash settlement.
-- **`[F2]` Pre-Booking Orders:** Manual intake from WhatsApp and in-person booker visits; 1-click bill conversion.
-- **`[F3]` Dispatch Slips:** Warehouse gate-passes for goods released to order bookers.
-- **`[F4]` Inventory & Imports:** Central catalog, stock levels, and inward container receiving.
-- **`[F5]` Order Bookers:** Field agent directory, commission tracking, and daily cash reconciliation.
-- **`[F6]` Retail Customers:** Customer shop directory, credit limits, and running Khata balances.
-- **`[F7]` Executive Profit Analytics:** Landed COGS profitability, daily revenue, and trend charts.
-- **`[F8]` Immutable Audit Ledger:** Cryptographic physical stock audit log and integrity checker.
+Collapsible navigation sidebar:
+- **Counter POS Billing:** Rapid wholesale invoice creation, instant SKU search, and cash settlement.
+- **Pre-Booking Orders:** Manual intake from WhatsApp and in-person booker visits; 1-click bill conversion.
+- **Dispatch Slips:** Warehouse gate-passes for goods released to order bookers.
+- **Inventory & Imports:** Central catalog, stock levels, and inward container receiving.
+- **Order Bookers:** Field agent directory, commission tracking, and daily cash reconciliation.
+- **Retail Customers:** Customer shop directory, credit limits, and running Khata balances.
+- **Executive Profit Analytics:** Landed COGS profitability, daily revenue, and trend charts.
+- **Immutable Audit Ledger:** Cryptographic physical stock audit log and integrity checker.
 
 ---
 
-## 3. High-Speed Counter POS Billing (`[F1]`)
+## 3. High-Speed Counter POS Billing
 
 Two-pane split terminal optimized for sub-second billing:
 
 ```
 ┌────────────────────────────────────────────────────────┬─────────────────────────┐
-│ SEARCH PRODUCT: [ SKU / Product Name (F2) ]            │ INVOICE SUMMARY         │
+│ SEARCH PRODUCT: [ SKU / Product Name ]                 │ INVOICE SUMMARY         │
 ├────────────────────────────────────────────────────────┼─────────────────────────┤
 │ # │ SKU   │ Product Name │ Qty │ Unit │ Rate │ Total   │ Shop: [ Select Shop ▼ ] │
 │───┼───────┼──────────────┼─────┼──────┼──────┼─────────┤ Booker: [ Optional ▼ ]  │
@@ -74,19 +73,19 @@ Two-pane split terminal optimized for sub-second billing:
 │   │       │              │     │      │      │         │ Discount: [ 2% 5% 10% ] │
 │   │       │              │     │      │      │         ├─────────────────────────┤
 │   │       │              │     │      │      │         │ NET PAYABLE:  $2,300.00 │
-│   │       │              │     │      │      │         │ [ Charge Bill (F1) ]    │
+│   │       │              │     │      │      │         │ [ Charge Bill ]         │
 ├───┴───────┴──────────────┴─────┴──────┴──────┴─────────┼─────────────────────────┤
 │ Empty Cart: Quick-Add Popular Wholesale Products Grid  │ Mode: [ Full Cash / Cr] │
 └────────────────────────────────────────────────────────┴─────────────────────────┘
 ```
 
 - **Quick-Add Catalog:** The empty cart displays 1-click quick-add wholesale tiles so cashiers never face a blank void.
-- **High-Speed SKU Search & Hotkeys:** Instant search dropdown with F2 hotkey and quick arrow selection.
+- **High-Speed SKU Search:** Instant search dropdown with quick arrow selection.
 - **Settlement Panel:** Bold Net Payable card with instant discount presets (2%, 5%, 10%) and glowing green settlement button.
 
 ---
 
-## 4. Manual Order Intake Interface (`[F2]`)
+## 4. Manual Order Intake Interface
 
 Specialized for entering orders sent by field bookers via **WhatsApp** or brought in **in person**:
 
@@ -106,13 +105,13 @@ Specialized for entering orders sent by field bookers via **WhatsApp** or brough
    - Multiline notes field to paste WhatsApp message snippets, voice note transcriptions, or physical slip numbers.
 5. **Actions:**
    - **Save Wholesale Order:** Saves as `PENDING` for warehouse picking.
-   - **Convert to Bill (`[F1]`):** 1-click loads order into POS cart for immediate checkout.
+   - **Convert to Bill:** 1-click loads order into POS cart for immediate checkout.
 
 ---
 
-## 5. Booker Dispatch & End-of-Day Reconciliation (`[F3]`, `[F5]`)
+## 5. Booker Dispatch & End-of-Day Reconciliation
 
-### 5.1 Warehouse Dispatch Gate Pass (`[F3]`)
+### 5.1 Warehouse Dispatch Gate Pass
 - Generates custody transfer gate pass when goods are handed to a booker for field delivery.
 - Shows total dispatched quantities per SKU.
 
