@@ -3,7 +3,12 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { AppProviders } from './app/providers';
 import { AppRouter } from './app/router';
+import { initDb, isTauri } from './lib/db/client';
 import './index.css';
+
+if (isTauri) {
+  initDb();
+}
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

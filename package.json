@@ -6,12 +6,16 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
     "@tanstack/react-query": "^5.66.0",
     "@tanstack/react-table": "^8.21.2",
+    "@tauri-apps/api": "^2.2.0",
+    "@tauri-apps/plugin-opener": "^2.2.5",
+    "@tauri-apps/plugin-sql": "^2.2.0",
     "axios": "^1.7.9",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
@@ -26,6 +30,7 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.2.0",
     "@types/node": "^22.13.9",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",

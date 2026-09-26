@@ -1,6 +1,7 @@
 import { apiClient } from './client';
 import { Bill } from '@/types/entities';
 import { PaginatedResponse, ApiResponse, CreateBillPayload, BillResponse } from '@/types/api';
+import { isTauri, tauriGetBills } from './tauriBridge';
 
 export const billingApi = {
   getBills: async (params?: {
@@ -11,11 +12,19 @@ export const billingApi = {
     start_date?: string;
     end_date?: string;
   }) => {
+    if (isTauri) {
+      const items = await tauriGetBills();
+      return { data: items, pagination: { total: items.length, page: 1, limit: items.length, totalPages: 1 } };
+    }
     const res = await apiClient.get<PaginatedResponse<Bill>>('/bills', { params });
     return res.data;
   },
 
   getBillById: async (id: number) => {
+    if (isTauri) {
+      const items = await tauriGetBills();
+      return items.find((b) => b.id === id) || ({} as Bill);
+    }
     const res = await apiClient.get<ApiResponse<Bill>>(`/bills/${id}`);
     return res.data.data;
   },
