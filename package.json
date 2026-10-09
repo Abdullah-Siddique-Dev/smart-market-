@@ -10,7 +10,7 @@
     "build:all": "pnpm build:server && pnpm build",
     "bundle:prepare": "node scripts/prepare-bundle.js",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "pnpm exec tauri"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
