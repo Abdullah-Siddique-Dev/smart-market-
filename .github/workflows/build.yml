@@ -22,23 +22,12 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: |
-          pnpm install
-          cd server
-          pnpm install
-          cd ..
-          pnpm add -g @tauri-apps/cli
+        run: pnpm install --no-frozen-lockfile
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           targets: x86_64-pc-windows-msvc
-
-      - name: Build Backend Server
-        run: pnpm build:server
-
-      - name: Prepare Bundle Resources
-        run: pnpm bundle:prepare
 
       - name: Build Tauri App
         uses: tauri-apps/tauri-action@v0
