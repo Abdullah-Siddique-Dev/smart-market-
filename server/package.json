@@ -6,7 +6,7 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "pnpm exec tsc",
+    "build": "tsc",
     "start": "node dist/server.js",
     "test:smoke": "tsx test-smoke.ts",
     "db:migrate": "tsx src/db/migrate.ts",

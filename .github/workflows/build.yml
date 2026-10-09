@@ -24,7 +24,7 @@ jobs:
       - name: Install dependencies
         run: |
           pnpm install --recursive
-          pnpm add -g @tauri-apps/cli
+          pnpm add -g typescript @tauri-apps/cli
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
