@@ -78,6 +78,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({
       return;
     }
 
+    if (!isNaN(pp) && sp < pp) {
+      setError('Wholesale selling price cannot be less than purchase/cost price');
+      return;
+    }
+
     try {
       setError(null);
       if (isEditing && product) {

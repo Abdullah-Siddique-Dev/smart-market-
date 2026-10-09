@@ -2,7 +2,6 @@ import { db } from './connection.js';
 import { runMigrations } from './migrate.js';
 import { hashPassword } from '../utils/password.js';
 import { USER_ROLES } from '../config/constants.js';
-import { fileURLToPath } from 'url';
 
 export async function seedDatabase(): Promise<void> {
   runMigrations();
@@ -25,13 +24,4 @@ export async function seedDatabase(): Promise<void> {
   db.exec("UPDATE system_users SET role = 'OWNER' WHERE role != 'OWNER';");
 
   console.log('✅ [Database Seed] Seeding completed.');
-}
-
-if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  seedDatabase()
-    .then(() => process.exit(0))
-    .catch((err) => {
-      console.error('❌ Seeding failed:', err);
-      process.exit(1);
-    });
 }

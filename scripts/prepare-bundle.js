@@ -39,12 +39,19 @@ if (fs.existsSync(serverPkg)) {
   fs.copyFileSync(serverPkg, path.join(destServerDir, 'package.json'));
 }
 
-// 5. Verify and copy server/node_modules
-const serverModules = path.join(serverDir, 'node_modules');
-if (!fs.existsSync(serverModules)) {
-  throw new Error(`❌ FATAL: ${serverModules} does not exist! Run pnpm install in server folder.`);
+// 5. Clean dest node_modules and copy real native modules (dereferenced, no symlinks)
+const destModules = path.join(destServerDir, 'node_modules');
+fs.rmSync(destModules, { recursive: true, force: true });
+fs.mkdirSync(destModules, { recursive: true });
+
+const bsSource = path.join(serverDir, 'node_modules', 'better-sqlite3');
+if (!fs.existsSync(bsSource)) {
+  throw new Error(`❌ FATAL: ${bsSource} does not exist! Run pnpm install in server folder.`);
 }
-console.log(`Copying server/node_modules -> ${destServerDir}/node_modules...`);
-fs.cpSync(serverModules, path.join(destServerDir, 'node_modules'), { recursive: true, dereference: true });
+
+const bsReal = fs.realpathSync(bsSource);
+const bsDest = path.join(destModules, 'better-sqlite3');
+console.log(`Copying better-sqlite3 (real path: ${bsReal}) -> ${bsDest}...`);
+fs.cpSync(bsReal, bsDest, { recursive: true });
 
 console.log('✅ [Prepare Bundle] Backend packaging complete with verified server.js and node_modules.');
