@@ -45,8 +45,22 @@ pub fn run() {
                     dev_server
                 };
 
+                let app_data_dir = app.path().app_data_dir().unwrap_or_else(|_| resource_dir.clone());
+                let db_dir = app_data_dir.join("data");
+                let _ = std::fs::create_dir_all(&db_dir);
+                let db_path = db_dir.join("smart_market.sqlite");
+
                 let mut cmd = Command::new(&node_bin);
                 cmd.arg(&server_script);
+                if let Some(parent) = server_script.parent() {
+                    if let Some(server_root) = parent.parent() {
+                        cmd.current_dir(server_root);
+                    } else {
+                        cmd.current_dir(parent);
+                    }
+                }
+                cmd.env("DATABASE_PATH", db_path.to_string_lossy().to_string());
+                cmd.env("PORT", "4000");
 
                 #[cfg(windows)]
                 {

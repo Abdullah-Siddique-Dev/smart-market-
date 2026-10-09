@@ -22,7 +22,10 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm install
+        run: |
+          pnpm install
+          cd server
+          pnpm install
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
