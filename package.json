@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:server": "pnpm --filter smart-market-os-server build",
+    "build:all": "pnpm build:server && pnpm build",
+    "bundle:prepare": "node scripts/prepare-bundle.js",
     "preview": "vite preview",
     "tauri": "tauri"
   },
